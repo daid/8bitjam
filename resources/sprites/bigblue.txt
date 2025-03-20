@@ -1,0 +1,21 @@
+{
+    texture: sprites/bigblue.png
+    texture_size: 128, 128
+    
+    loop: true
+    size: 2, 2
+    frame_size: 32, 32
+    delay: 0.4
+    line_length: 4
+    
+    [Idle] {
+        frames: 2
+    }
+    [Ready] {
+        frames: 0, 1
+    }
+    [Walk] {
+        frames: 0, 1
+        delay: 0.1
+    }
+}

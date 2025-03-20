@@ -1,0 +1,66 @@
+[HUD] {
+    stretch: true
+    {
+        type: panel
+        alignment: bottom
+        size: 256, 16
+        layout: vertical
+
+        {
+            layout: horizontal
+            {
+                type: label
+                caption: [HEART]:
+                size: 16, 8
+                margin: 16, 0, 0, 0
+                text.alignment: left
+            }
+            [HP] {
+                type: label
+                caption: 
+                size: 64, 8
+                text.alignment: left
+            }
+            [NAME] {
+                type: label
+                caption: 
+                size: 64, 8
+                text.alignment: left
+            }
+        }
+    }
+
+    [MESSAGE_WINDOW] {
+        visible: false
+        {
+            type: BorderPanel
+            size: 48, 48
+            [IMAGE] {
+                type: image
+                size: 1, 1
+                alignment: center
+            }
+        }
+        {
+            type: BorderPanel
+            size: 208, 48
+            position: 48, 0
+            padding: 8
+            [TEXT] {
+                type: label
+                caption: 
+                line_wrap: true
+                text.alignment: topleft
+                size: 192, 32
+            }
+        }
+    }
+
+    [LUA_ERROR] {
+        type: label
+        size: 256, 128
+        text.alignment: topleft
+        line_wrap: true
+        alignment: top
+    }
+}

@@ -1,0 +1,46 @@
+{
+    hp: 10
+    heart: 3
+    move: 5
+    terrain_class: Basic
+
+    [Hoplite] {
+        name: Hoplite
+        hp: 10
+        sprite.red: sprites/HopliteRed.txt
+        sprite.blue: sprites/HopliteBlue.txt
+        action.0: label=Spear type=attack range=1 damage=4 class=spear
+    }
+    [Pirate] {
+        name: Pirate
+        hp: 10
+        sprite.red: sprites/PirateRed.txt
+        sprite.blue: sprites/PirateBlue.txt
+        action.0: label=Sword type=attack range=1 damage=4 class=sword
+    }
+    [Harpy] {
+        name: Harpy
+        hp: 8
+        sprite.red: sprites/HarpyRed.txt
+        sprite.blue: sprites/HarpyBlue.txt
+        terrain_class: Fly
+        action.0: label=Claw type=attack range=1 damage=3 class=spear
+        action.1: label=Charm type=charm range=1 damage=1
+    }
+    [Cherub] {
+        name: Cherub
+        hp: 8
+        sprite.red: sprites/CherubRed.txt
+        sprite.blue: sprites/CherubBlue.txt
+        terrain_class: Fly
+        action.0: type=attack range=1 damage=2
+        action.1: type=charm range=1-2 damage=1
+    }
+    [Hero] {
+        name: Hero
+        hp: 12
+        sprite.red: sprites/HeroRed.txt
+        sprite.blue: sprites/HeroBlue.txt
+        action.0: type=attack range=1 damage=5 type=sword
+    }
+}

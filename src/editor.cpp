@@ -1,0 +1,252 @@
+#include "editor.h"
+#include "main.h"
+#include "unitinfo.h"
+#include "tileinfo.h"
+#include <sp2/scene/scene.h>
+#include <sp2/scene/tilemap.h>
+#include <sp2/scene/camera.h>
+#include <sp2/math/plane.h>
+#include <sp2/graphics/gui/loader.h>
+#include <sp2/graphics/gui/widget/togglebutton.h>
+#include <sp2/graphics/gui/widget/listbox.h>
+#include <sp2/graphics/spriteAnimation.h>
+#include <sp2/stringutil/convert.h>
+#include <sp2/io/keyValueTreeSaver.h>
+#include <sp2/io/keyValueTreeLoader.h>
+
+
+class EditorUnit : public sp::Node
+{
+public:
+    EditorUnit(sp::P<sp::Node> parent, sp::string unit_type, int team, sp::Vector2i position)
+    : sp::Node(parent), unit_type(unit_type), pos(position), team(team)
+    {
+        auto unit_info = UnitInfo::get(unit_type);
+        if (!unit_info) return;
+        setAnimation(sp::SpriteAnimation::load(unit_info->sprite[team]));
+        animationPlay("Ready");
+        setPosition(sp::Vector2d(position) + sp::Vector2d(0.5, 0.5));
+    }
+
+    sp::string unit_type;
+    sp::Vector2i pos;
+    int team;
+};
+
+
+class EditorScene : public sp::Scene
+{
+public:
+    EditorScene() : sp::Scene("EDITOR") {
+        ground_tilemap = makeGroundTilemap(getRoot());
+
+        auto camera = new sp::Camera(getRoot());
+        camera->setOrtographic({8, 7});
+        setDefaultCamera(camera);
+
+        auto loader = sp::gui::Loader("gui/editor.gui");
+        gui = loader.create("EDITOR");
+        auto left_button = loader.create("BTN", gui->getWidgetWithID("PALETTE"));
+        left_button->setAttribute("caption", "<");
+        left_button->setEventCallback([this](sp::Variant) {
+            if (palette_offset < 1) return;
+            palette_offset -= 1;
+            updateVisiblePalette();
+        });
+        float fx = 1.0f / float(tilesetSize().x);
+        float fy = 1.0f / float(tilesetSize().y);
+        for(int id=0; id<tileIndexMax(); id++) {
+            if (getTileType(id) == TileType::Void) continue;
+            float x = float(id % tilesetSize().x) / float(tilesetSize().x);
+            float y = float(id / tilesetSize().x) / float(tilesetSize().y);
+
+            auto tile = loader.create("TILE", gui->getWidgetWithID("PALETTE"));
+            tile->getWidgetWithID("IMAGE")->setAttribute("uv", sp::string(x, 4) + "," + sp::string(y, 4) + "," + sp::string(fx, 4) + "," + sp::string(fy, 4));
+            tile->setEventCallback([this, tile, id](sp::Variant v) {
+                for(sp::P<sp::gui::ToggleButton> w : gui->getWidgetWithID("PALETTE")->getChildren()) {
+                    if (!w) continue;
+                    w->setActive(w == tile && v.getInteger());
+                }
+                if (v.getInteger())
+                    draw_tile = id;
+                else
+                    draw_tile = -1;
+            });
+        }
+        for(auto unitinfo : UnitInfo::getAll()) {
+            for(int team=0; team<2; team++) {
+                auto tile = loader.create("TILE", gui->getWidgetWithID("PALETTE"));
+                tile->getWidgetWithID("IMAGE")->setAttribute("size", "1, 1");
+                tile->getWidgetWithID("IMAGE")->setAttribute("alignment", "center");
+                tile->getWidgetWithID("IMAGE")->setAnimation(sp::SpriteAnimation::load(unitinfo.sprite[team]));
+                tile->getWidgetWithID("IMAGE")->animationPlay("Ready");
+                tile->getWidgetWithID("IMAGE")->render_data.scale = {16, 16, 16};
+                tile->setEventCallback([this, tile, unitinfo, team](sp::Variant v) {
+                    for(sp::P<sp::gui::ToggleButton> w : gui->getWidgetWithID("PALETTE")->getChildren()) {
+                        if (!w) continue;
+                        w->setActive(w == tile && v.getInteger());
+                    }
+                    if (v.getInteger()) {
+                        draw_unit = unitinfo.key;
+                        draw_unit_team = team;
+                    } else {
+                        draw_unit = "";
+                    }
+                    draw_tile = -1;
+                });
+            }
+        }
+        auto right_button = loader.create("BTN", gui->getWidgetWithID("PALETTE"));
+        right_button->setAttribute("caption", ">");
+        right_button->setEventCallback([this](sp::Variant) {
+            if (palette_offset >= gui->getWidgetWithID("PALETTE")->getChildren().size() - palette_size - 2) return;
+            palette_offset += 1;
+            updateVisiblePalette();
+        });
+        updateVisiblePalette();
+
+        sp::P<sp::gui::Listbox> files = gui->getWidgetWithID("FILES");
+        for(int n=0; n<20; n++)
+            files->addItem(sp::string(n));
+        files->setEventCallback([this](sp::Variant v) {
+            saveLevel(current_level_index);
+            current_level_index = v.getString();
+            loadLevel(current_level_index);
+        });
+        loadLevel("0");
+    }
+
+    void updateVisiblePalette()
+    {
+        int index = 0;
+        for(sp::P<sp::gui::ToggleButton> btn : gui->getWidgetWithID("PALETTE")->getChildren()) {
+            if (!btn) continue;
+            btn->setVisible(index >= palette_offset && index < palette_offset + palette_size);
+            index++;
+        }
+    }
+
+    virtual ~EditorScene()
+    {
+        saveLevel(current_level_index);
+        gui.destroy();
+    }
+
+    bool onPointerMove(sp::Ray3d ray, int id) override
+    {
+        auto p3 = sp::Plane3d({0.0, 0.0, 0.0}, {0.0, 0.0, 1.0}).intersect(ray);
+        auto p = sp::Vector2i(std::floor(p3.x), std::floor(p3.y));
+        gui->getWidgetWithID("TOOLTIP")->setAttribute("caption", sp::string(p.x) + "," + sp::string(p.y));
+        return true;
+    }
+
+    bool onPointerDown(sp::io::Pointer::Button button, sp::Ray3d ray, int id) override
+    {
+        drag_button = button;
+        drag_start = sp::Plane3d({0.0, 0.0, 0.0}, {0.0, 0.0, 1.0}).intersect(ray);
+        onPointerDrag(ray, id);
+        return true;
+    }
+
+    void onPointerDrag(sp::Ray3d ray, int id) override
+    {
+        onPointerMove(ray, id);
+        auto p3 = sp::Plane3d({0.0, 0.0, 0.0}, {0.0, 0.0, 1.0}).intersect(ray);
+        if (drag_button == sp::io::Pointer::Button::Right) {
+            auto diff = drag_start - p3;
+            getCamera()->setPosition(getCamera()->getPosition2D() + sp::Vector2d(diff.x, diff.y));
+        } else {
+            auto p = sp::Vector2i(std::floor(p3.x), std::floor(p3.y));
+            if (draw_unit == "") {
+                ground_tilemap->setTile(p, draw_tile);
+            } else {
+                bool destroyed = false;
+                for(sp::P<EditorUnit> eu : getRoot()->getChildren()) {
+                    if (eu && eu->pos == p) {
+                        eu.destroy();
+                        destroyed = true;
+                    }
+                }
+                if (!destroyed)
+                    new EditorUnit(getRoot(), draw_unit, draw_unit_team, p);
+            }
+        }
+    }
+
+    void saveLevel(sp::string name)
+    {
+        LOG(Debug, "Saving:", name);
+        sp::KeyValueTree kvt;
+        kvt.root_nodes.emplace_back();
+        auto& node = kvt.root_nodes.back();
+        node.id = "TILES";
+        for(auto p : ground_tilemap->getEnclosingRect()) {
+            auto t = ground_tilemap->getTileIndex(p);
+            if (t >= 0) {
+                node.items[sp::string(p.x) + "," + sp::string(p.y)] = sp::string(t);
+            }
+        }
+        kvt.root_nodes.emplace_back();
+        auto& unit_root = kvt.root_nodes.back();
+        unit_root.id = "UNITS";
+        for(sp::P<EditorUnit> eu : getRoot()->getChildren()) if (eu) {
+            unit_root.child_nodes.emplace_back();
+            auto& unit_node = unit_root.child_nodes.back();
+            unit_node.id = eu->unit_type;
+            unit_node.items["team"] = sp::string(eu->team);
+            unit_node.items["x"] = sp::string(eu->pos.x);
+            unit_node.items["y"] = sp::string(eu->pos.y);
+        }
+        sp::io::KeyValueTreeSaver::save("resources/level/" + name + ".txt", kvt);
+    }
+
+    void loadLevel(sp::string name)
+    {
+        auto kvt = sp::io::KeyValueTreeLoader::loadFile("resources/level/" + name + ".txt");
+        ground_tilemap.destroy();
+        for(sp::P<EditorUnit> eu : getRoot()->getChildren())
+            eu.destroy();
+        ground_tilemap = makeGroundTilemap(getRoot());
+        if (!kvt) return;
+        if (auto tiles = kvt->findId("TILES")) {
+            for(auto [k, v] : tiles->items) {
+                auto [xs, ys] = k.partition(",");
+                ground_tilemap->setTile({sp::stringutil::convert::toInt(xs), sp::stringutil::convert::toInt(ys)}, sp::stringutil::convert::toInt(v));
+            }
+        }
+        if (auto units = kvt->findId("UNITS")) {
+            for(auto& unit_node : units->child_nodes) {
+                if (UnitInfo::get(unit_node.id)) {
+                    new EditorUnit(getRoot(), unit_node.id, sp::stringutil::convert::toInt(unit_node.items["team"]), {sp::stringutil::convert::toInt(unit_node.items["x"]), sp::stringutil::convert::toInt(unit_node.items["y"])});
+                }
+            }
+        }
+        auto r = ground_tilemap->getEnclosingRect();
+        getCamera()->setPosition(sp::Vector2d(r.position) + sp::Vector2d(r.size) * 0.5);
+    }
+
+    void onUpdate(float delta) override
+    {
+        if (controller.start.getUp()) {
+            openMainMenu();
+            delete this;
+            return;
+        }
+    }
+
+    sp::P<sp::Tilemap> ground_tilemap;
+    sp::P<sp::gui::Widget> gui;
+    int draw_tile = -1;
+    sp::string draw_unit;
+    int draw_unit_team = 0;
+    int palette_offset = 0;
+    static constexpr int palette_size = 12;
+    sp::io::Pointer::Button drag_button;
+    sp::Vector3d drag_start;
+    sp::string current_level_index = "0";
+};
+
+void openEditor()
+{
+    new EditorScene();
+}

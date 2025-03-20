@@ -16,6 +16,8 @@
 #include <sp2/graphics/scene/basicnoderenderpass.h>
 #include <sp2/graphics/scene/collisionrenderpass.h>
 #include <sp2/graphics/textureManager.h>
+#include <sp2/graphics/renderTexture.h>
+#include <sp2/graphics/meshData.h>
 #include <sp2/scene/scene.h>
 #include <sp2/scene/node.h>
 #include <sp2/scene/camera.h>
@@ -23,11 +25,16 @@
 #include <array>
 
 #include "main.h"
+#include "editor.h"
 #include "mainScene.h"
 #include "ingameMenu.h"
+#include "tileinfo.h"
+#include "unitinfo.h"
+#include "textmenu.h"
 
 
 sp::P<sp::Window> window;
+sp::P<sp::Node> screen_node;
 sp::io::Keybinding escape_key("ESCAPE", {"Escape", "AC Back"});
 Controller controller;
 
@@ -42,6 +49,10 @@ void openMainMenu()
         menu.destroy();
         new Scene();
     });
+    menu->getWidgetWithID("EDITOR")->setEventCallback([=](sp::Variant v) mutable {
+        menu.destroy();
+        openEditor();
+    });
     menu->getWidgetWithID("OPTIONS")->setEventCallback([=](sp::Variant v) mutable {
         menu.destroy();
         openOptionsMenu();
@@ -49,6 +60,13 @@ void openMainMenu()
     menu->getWidgetWithID("CREDITS")->setEventCallback([=](sp::Variant v) mutable {
         menu.destroy();
         openCreditsMenu();
+    });
+    menu->getWidgetWithID("CRT")->setEventCallback([=](sp::Variant v) mutable {
+        if (v.getInteger()) {
+            screen_node->render_data.shader = sp::Shader::get("crt.shader");
+        } else {
+            screen_node->render_data.shader = sp::Shader::get("internal:basic.shader");
+        }
     });
     menu->getWidgetWithID("QUIT")->setEventCallback([](sp::Variant v){
         sp::Engine::getInstance()->shutdown();
@@ -207,31 +225,71 @@ static void openCreditsMenu()
     });
 }
 
+class UpdateScreenSizePass : public sp::RenderPass
+{
+public:
+    void render(sp::RenderQueue& queue) override
+    {
+        queue.add([]() {
+            auto size = sp::Vector2f(window->getSize());
+            if (size.x / size.y > 256.0f / 224.0f) {
+                size.x = size.y / 224.0f * 256.0f;
+            } else {
+                size.y = size.x / 256.0f * 224.0f;
+            }
+            auto s = sp::Shader::get("crt.shader");
+            s->bind();
+            s->setUniform("output_size", size);
+        });
+    }
+};
+
 int main(int argc, char** argv)
 {
     sp::P<sp::Engine> engine = new sp::Engine();
+    SP_REGISTER_WIDGET("BorderPanel", BorderPanel);
 
     //Create resource providers, so we can load things.
     sp::io::ResourceProvider::createDefault();
 
     //Disable or enable smooth filtering by default, enabling it gives nice smooth looks, but disabling it gives a more pixel art look.
-    sp::texture_manager.setDefaultSmoothFiltering(true);
+    sp::texture_manager.setDefaultSmoothFiltering(false);
 
     //Create a window to render on, and our engine.
-    window = new sp::Window();
+    window = new sp::Window(256.0f/224.0f);
+    window->setClearColor({0, 0, 0});
 #if !defined(DEBUG) && !defined(EMSCRIPTEN)
     window->setFullScreen(true);
 #endif
 
     sp::gui::Theme::loadTheme("default", "gui/theme/basic.theme.txt");
-    new sp::gui::Scene(sp::Vector2d(640, 480));
+    new sp::gui::Scene(sp::Vector2d(256, 224));
 
+    sp::RenderTexture screen_texture("SCREEN", {256, 224}, false);
     sp::P<sp::SceneGraphicsLayer> scene_layer = new sp::SceneGraphicsLayer(1);
     scene_layer->addRenderPass(new sp::BasicNodeRenderPass());
 #ifdef DEBUG
     scene_layer->addRenderPass(new sp::CollisionRenderPass());
 #endif
+    scene_layer->setTarget(&screen_texture);
     window->addLayer(scene_layer);
+
+    auto ss = new sp::Scene("SCREEN_SCENE");
+    auto sc = new sp::Camera(ss->getRoot());
+    sc->setOrtographic({256.0f * 0.5f, 224.0f * 0.5f});
+    screen_node = new sp::Node(ss->getRoot());
+    screen_node->render_data.type = sp::RenderData::Type::Normal;
+    screen_node->render_data.mesh = sp::MeshData::createQuad({256.0f, 224.0f}, {0.0f, 1.0f}, {1.0f, 0.0f});
+    screen_node->render_data.shader = sp::Shader::get("internal:basic.shader");
+    screen_node->render_data.texture = &screen_texture;
+
+    sp::P<sp::SceneGraphicsLayer> screen_layer = new sp::SceneGraphicsLayer(2);
+    screen_layer->addRenderPass(new UpdateScreenSizePass());
+    screen_layer->addRenderPass(new sp::BasicNodeRenderPass(sc));
+    window->addLayer(screen_layer);
+
+    initTileInfo();
+    UnitInfo::init();
 
     new sp::audio::MusicPlayer("music");
     new IngameMenuScene();

@@ -1,0 +1,20 @@
+[ACTION_MENU] {
+    layout: vertical
+    alignment: right
+}
+
+[NAV] {
+    type: keynavigator
+    size: 16, 16
+    select: A
+    visible: true
+}
+
+[BUTTON] {
+    @ref: BUTTON
+}
+
+[@BUTTON] {
+    type: button
+    size: 64, 16
+}

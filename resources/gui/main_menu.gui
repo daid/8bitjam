@@ -5,7 +5,7 @@
         alignment: top
         type: label
         theme_data: menu_menu_title
-        caption: Game Title
+        caption: Fight or Flirt
         scale_to_text: true
     }
 
@@ -19,15 +19,26 @@
 
             {
                 type: keynavigator
-                margin: -5
-                stretch: true
-                select: PRIMARY
+                size: 16, 16
+                select: A
+                visible: true
             }
+        }
+
+        [EDITOR] {
+            @ref: MAIN_BUTTON
+            caption: EDITOR
         }
 
         [OPTIONS] {
             @ref: MAIN_BUTTON
             caption: OPTIONS
+        }
+
+        [CRT] {
+            @ref: MAIN_BUTTON
+            type: togglebutton
+            caption: CRT
         }
 
         [CREDITS] {
@@ -109,7 +120,7 @@
     
     [CREDITS] {
         layout: vertical
-        position: 0, 400
+        position: 0, 200
         alignment: top
         {
             @ref: CREDITS_SECTION
@@ -233,14 +244,14 @@
 
 [@MAIN_BUTTON] {
     type: button
-    size: 200, 50
-    margin: 10
+    size: 64, 16
+    margin: 4
     alignment: center
 }
 [@OPTIONS_SLIDER] {
     layout: vertical
     {
-        size: 300, 30
+        size: 180, 16
         {
             type: label
             caption: {LABEL}
@@ -255,7 +266,7 @@
         }
     }
     [SLIDER] {
-        size: 300, 30
+        size: 180, 16
         type: slider
         range: 100
     }
@@ -282,18 +293,18 @@
 [@CREDITS_SECTION] {
     type: label
     scale_to_text: true
-    text.size: 25
+    text.size: 8
     alignment: center
 }
 [@CREDITS_TITLE] {
     type: label
     scale_to_text: true
-    text.size: 15
+    text.size: 8
     text.alignment: left
 }
 [@CREDITS_LINE] {
     type: label
     scale_to_text: true
-    text.size: 10
+    text.size: 8
     text.alignment: left
 }

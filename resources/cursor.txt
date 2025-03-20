@@ -1,0 +1,22 @@
+{
+    texture: cursor.png
+    texture_size: 64, 64
+    
+    loop: true
+    size: 2, 2
+    frame_size: 32, 32
+    delay: 0.4
+    
+    [Idle] {
+        position: 0, 0
+        frame_count: 1
+    }
+    [Error] {
+        position: 0, 32
+        frame_count: 1
+    }
+    [Selected] {
+        position: 32, 0
+        frame_count: 1
+    }
+}

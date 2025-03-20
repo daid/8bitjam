@@ -13,10 +13,10 @@ public:
     sp::io::Keybinding left;
     sp::io::Keybinding right;
 
-    sp::io::Keybinding primary_action;
-    sp::io::Keybinding secondary_action;
-    sp::io::Keybinding protect_action;
-    sp::io::Keybinding special_action;
+    sp::io::Keybinding b;
+    sp::io::Keybinding a;
+    sp::io::Keybinding start;
+    sp::io::Keybinding select;
 
     sp::PList<sp::io::Keybinding> all;
 };

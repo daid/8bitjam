@@ -1,0 +1,13 @@
+{
+    void: 1000, 0
+    solid: 1000, 0
+    grass: 1, 0
+    water: 8, 1
+    mountain: 5, 1
+    [Basic] {
+    }
+    [Fly] {
+        water: 1, 0
+        mountain: 2, 0
+    }
+}

@@ -14,9 +14,8 @@
 
             {
                 type: keynavigator
-                margin: -5
-                stretch: true
-                select: PRIMARY
+                select: A
+                size: 16, 16
             }
         }
 
@@ -29,6 +28,6 @@
 
 [@BUTTON] {
     type: button
-    size: 200, 50
-    margin: 5
+    size: 64, 16
+    margin: 4
 }

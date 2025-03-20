@@ -6,7 +6,7 @@
 
 
 IngameMenuScene::IngameMenuScene()
-: sp::gui::Scene(sp::Vector2d(640, 480), "INGAME_MENU", 101)
+: sp::gui::Scene(sp::Vector2d(256, 224), "INGAME_MENU", 101)
 {
     disable();
 }

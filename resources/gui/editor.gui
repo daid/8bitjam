@@ -1,0 +1,37 @@
+[EDITOR] {
+    stretch: true
+
+    [FILES] {
+        type: listbox
+        alignment: topleft
+        size: 30, 150
+    }
+
+    [PALETTE] {
+        alignment: bottom
+        layout: horizontal
+    }
+
+    [TOOLTIP] {
+        alignment: topright
+        type: label
+        text.alignment: topright
+        size: 200, 1
+    }
+}
+
+[BTN] {
+    type: button
+    size: 18, 18
+}
+
+[TILE] {
+    type: togglebutton
+    size: 18, 18
+    [IMAGE] {
+        type: image
+        size: 16, 16
+        margin: 1
+        image: tileset.png
+    }
+}
