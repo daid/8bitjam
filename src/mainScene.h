@@ -34,6 +34,7 @@ public:
     std::vector<sp::Vector2i> planMovePath(sp::P<Unit> source, sp::Vector2i target);
 
     void executeAITurnFor(sp::P<Unit> unit);
+    float scorePosition(sp::Vector2i pos, Team team);
 
     float hold_button_time = 0.0f;
 

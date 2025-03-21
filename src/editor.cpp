@@ -135,6 +135,7 @@ public:
                     draw_tile = id;
                 else
                     draw_tile = -1;
+                draw_unit = "";
             });
         }
         for(auto unitinfo : UnitInfo::getAll()) {

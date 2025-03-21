@@ -563,32 +563,59 @@ void Scene::executeAITurnFor(sp::P<Unit> unit)
         sp::Vector2i position;
         const Action* action;
         sp::P<Unit> target;
+        float score;
     };
     std::vector<Move> possible_attack_moves;
+    std::vector<Move> possible_normal_moves;
 
     astar_source = unit;
     for(auto [p, c] : Dijkstra(unit->pos, getAStarNeighbors)) {
         if (c <= selected_unit->unit_info->move && (getUnitAt(p) == nullptr || getUnitAt(p) == unit)) {
+            if (p != unit->pos) {
+                possible_normal_moves.push_back({p, nullptr, nullptr, scorePosition(p, unit->team)});
+            }
             for(const auto& action : selected_unit->unit_info->actions) {
                 if (action.type != Action::Type::Attack) continue;
                 for(auto offset : action.targetOffsets()) {
                     auto ap = p + offset;
                     auto target = getUnitAt(ap);
                     if (target && target->team == Team::Player) {
-                        possible_attack_moves.push_back({p, &action, target});
+                        possible_attack_moves.push_back({p, &action, target, 0});
                     }
                 }
             }
         }
     }
-    if (possible_attack_moves.empty()) return;
-    auto move = possible_attack_moves[sp::irandom(0, possible_attack_moves.size()-1)];
-    if (move.position != unit->pos) {
+    if (!possible_attack_moves.empty()) {
+        auto move = possible_attack_moves[sp::irandom(0, possible_attack_moves.size()-1)];
+        if (move.position != unit->pos) {
+            auto path = AStar<sp::Vector2i>(unit->pos, move.position, getAStarNeighbors, getAStarDistance);
+            if (path.empty()) return;
+            unit->animateMovement(path);
+            unit->pos = move.position;
+        }
+        selected_action = move.action;
+        target_unit = move.target;
+    }
+    else if (!possible_normal_moves.empty()) {
+        std::sort(possible_normal_moves.begin(), possible_normal_moves.end(), [](const auto& a, const auto& b) { return a.score > b.score; });
+        auto& move = possible_normal_moves.front();
         auto path = AStar<sp::Vector2i>(unit->pos, move.position, getAStarNeighbors, getAStarDistance);
         if (path.empty()) return;
         unit->animateMovement(path);
         unit->pos = move.position;
     }
-    selected_action = move.action;
-    target_unit = move.target;
+}
+
+float Scene::scorePosition(sp::Vector2i pos, Team team)
+{
+    float score = sp::random(0, 0.8);
+    for(sp::P<Unit> unit : getRoot()->getChildren()) {
+        if (unit && unit->team != team) {
+            auto diff = pos - unit->pos;
+            auto dist = std::abs(diff.x) + std::abs(diff.y);
+            score -= dist;
+        }
+    }
+    return score;
 }
