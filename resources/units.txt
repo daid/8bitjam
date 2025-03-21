@@ -43,4 +43,40 @@
         sprite.blue: sprites/HeroBlue.txt
         action.0: type=attack range=1 damage=5 type=sword
     }
+    [Zeus] {
+        name: Zeus
+        hp: 30
+        sprite.red: sprites/ZeusRed.txt
+        sprite.blue: sprites/ZeusBlue.txt
+    }
+    [Heracles] {
+        name: Heracles
+        hp: 15
+        sprite.red: sprites/HeraclesRed.txt
+        sprite.blue: sprites/HeraclesBlue.txt
+    }
+    [Artemis] {
+        name: Artemis
+        hp: 15
+        sprite.red: sprites/ArtemisRed.txt
+        sprite.blue: sprites/ArtemisBlue.txt
+    }
+    [Aphrodite] {
+        name: Aphrodite
+        hp: 15
+        sprite.red: sprites/AphroditeRed.txt
+        sprite.blue: sprites/AphroditeBlue.txt
+    }
+    [Poseidon] {
+        name: Poseidon
+        hp: 15
+        sprite.red: sprites/PoseidonRed.txt
+        sprite.blue: sprites/PoseidonBlue.txt
+    }
+    [Apollo] {
+        name: Apollo
+        hp: 15
+        sprite.red: sprites/ApolloRed.txt
+        sprite.blue: sprites/ApolloBlue.txt
+    }
 }

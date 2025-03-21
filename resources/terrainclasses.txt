@@ -1,13 +1,17 @@
 {
+    // [movement cost], [added defense]
     void: 1000, 0
-    solid: 1000, 0
     grass: 1, 0
+    road: 1, 0
     water: 8, 1
+    desert: 1, 0
     mountain: 5, 1
+    forest: 2, 1
+    town: 1, 1
     [Basic] {
     }
     [Fly] {
         water: 1, 0
-        mountain: 2, 0
+        mountain: 1, 0
     }
 }

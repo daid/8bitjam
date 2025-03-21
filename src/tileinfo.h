@@ -5,10 +5,13 @@
 enum class TileType
 {
     Void,
-    Solid,
     Grass,
+    Road,
     Water,
+    Desert,
     Mountain,
+    Forest,
+    Town,
 
     MAX
 };
@@ -19,6 +22,7 @@ TileType getTileType(int index);
 sp::string getTileTypeName(TileType tt);
 int tileIndexMax();
 sp::Vector2i tilesetSize();
+int getAutoTile(int index);
 
 class TerrainClass
 {

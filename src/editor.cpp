@@ -15,6 +15,43 @@
 #include <sp2/io/keyValueTreeLoader.h>
 
 
+struct AutoTileData
+{
+    sp::string info;
+    sp::Vector2i offset;
+};
+
+AutoTileData auto_tile_data[] = {
+    {"?0? 0.1 ?1?", {-1, -1}},
+    {"?0? 1.1 ?1?", { 0, -1}},
+    {"?0? 1.0 ?1?", { 1, -1}},
+    
+    {"?1? 0.1 ?1?", {-1,  0}},
+    {"?1? 1.1 ?1?", { 0,  0}},
+    {"?1? 1.0 ?1?", { 1,  0}},
+
+    {"?1? 0.1 ?0?", {-1,  1}},
+    {"?1? 1.1 ?0?", { 0,  1}},
+    {"?1? 1.0 ?0?", { 1,  1}},
+
+    {"?0? 0.0 ?1?", { 2, -1}},
+    {"?1? 0.0 ?1?", { 2,  0}},
+    {"?1? 0.0 ?0?", { 2,  1}},
+
+    {"?0? 0.1 ?0?", {-1,  2}},
+    {"?0? 1.1 ?0?", { 0,  2}},
+    {"?0? 1.0 ?0?", { 1,  2}},
+
+    {"111 1.1 110", { 3, -1}},
+    {"111 1.1 011", { 4, -1}},
+    {"110 1.1 111", { 3,  0}},
+    {"011 1.1 111", { 4,  0}},
+
+    {"?0? 0.0 ?0?", {2, 2}},
+};
+int auto_tile_lookup[0x100];
+
+
 class EditorUnit : public sp::Node
 {
 public:
@@ -38,6 +75,32 @@ class EditorScene : public sp::Scene
 {
 public:
     EditorScene() : sp::Scene("EDITOR") {
+        for(auto& n : auto_tile_lookup) n = 0xFFFFFF;
+        for(auto& atd : auto_tile_data) {
+            int mask = 0;
+            int match = 0;
+            auto f = [&mask, &match](char c, int shift) {
+                if (c == '0') { mask |= 1 << shift; }
+                if (c == '1') { mask |= 1 << shift; match |= 1 << shift; }
+            };
+            f(atd.info[0], 5);
+            f(atd.info[1], 6);
+            f(atd.info[2], 7);
+            f(atd.info[4], 3);
+            f(atd.info[6], 4);
+            f(atd.info[8], 0);
+            f(atd.info[9], 1);
+            f(atd.info[10], 2);
+            for(int n=0; n<0x100; n++) {
+                if ((n & mask) == match) {
+                    if (auto_tile_lookup[n] != 0xFFFFFF) LOG(Debug, "autotile overlap...");
+                    auto_tile_lookup[n] = atd.offset.x + atd.offset.y * tilesetSize().x;
+                }
+            }
+        }
+        for(int n=0; n<0x100; n++) {
+            if (n == 0xFFFFFF) LOG(Debug, "Autotile lookup missing for:", sp::string::hex(n));
+        }
         ground_tilemap = makeGroundTilemap(getRoot());
 
         auto camera = new sp::Camera(getRoot());
@@ -57,6 +120,7 @@ public:
         float fy = 1.0f / float(tilesetSize().y);
         for(int id=0; id<tileIndexMax(); id++) {
             if (getTileType(id) == TileType::Void) continue;
+            if (getAutoTile(id) != -1 && getAutoTile(id) != id) continue;
             float x = float(id % tilesetSize().x) / float(tilesetSize().x);
             float y = float(id / tilesetSize().x) / float(tilesetSize().y);
 
@@ -159,6 +223,7 @@ public:
             auto p = sp::Vector2i(std::floor(p3.x), std::floor(p3.y));
             if (draw_unit == "") {
                 ground_tilemap->setTile(p, draw_tile);
+                updateAutoTiles();
             } else {
                 bool destroyed = false;
                 for(sp::P<EditorUnit> eu : getRoot()->getChildren()) {
@@ -223,6 +288,7 @@ public:
         }
         auto r = ground_tilemap->getEnclosingRect();
         getCamera()->setPosition(sp::Vector2d(r.position) + sp::Vector2d(r.size) * 0.5);
+        updateAutoTiles();
     }
 
     void onUpdate(float delta) override
@@ -231,6 +297,25 @@ public:
             openMainMenu();
             delete this;
             return;
+        }
+    }
+
+    void updateAutoTiles()
+    {
+        for(auto p : ground_tilemap->getEnclosingRect()) {
+            auto t = ground_tilemap->getTileIndex(p);
+            auto att = getAutoTile(t);
+            if (att == -1) continue;
+            int mask = 0;
+            for(auto p2 : sp::Rect2i({-1, -1}, {3, 3})) {
+                if (getAutoTile(ground_tilemap->getTileIndex(p + p2)) == att) {
+                    mask |= 1 << ((p2.x + 1)  + (p2.y + 1) * 3);
+                }
+            }
+            mask = (mask & 0x0F) | ((mask >> 1) & 0xF0);
+            auto offset = auto_tile_lookup[mask];
+            if (offset != 0xFFFFFF)
+                ground_tilemap->setTile(p, att + offset);
         }
     }
 

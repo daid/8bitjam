@@ -6,6 +6,7 @@
 static sp::Vector2i tileset_size;
 static std::vector<TileType> tile_types;
 static std::unordered_map<sp::string, TerrainClass> terrain_classes;
+static std::vector<int> auto_tiles;
 
 void initTileInfo()
 {
@@ -20,13 +21,31 @@ void initTileInfo()
         if (!line.empty())
             tileset_size.y += 1;
     }
+    LOG(Debug, "tileset_size:", tileset_size);
     tile_types.resize(tileIndexMax(), TileType::Void);
+    auto_tiles.resize(tileIndexMax(), -1);
+
     for(auto [p, t] : type_mapping) {
-        switch(t) {
-            case 'g': tile_types[p.x+p.y*tileset_size.x] = TileType::Grass; break;
-            case 'w': tile_types[p.x+p.y*tileset_size.x] = TileType::Water; break;
-            case 'S': tile_types[p.x+p.y*tileset_size.x] = TileType::Solid; break;
-            case 'M': tile_types[p.x+p.y*tileset_size.x] = TileType::Mountain; break;
+        int idx = p.x+p.y*tileset_size.x;
+        switch(std::tolower(t)) {
+            case 'g': tile_types[idx] = TileType::Grass; break;
+            case 'r': tile_types[idx] = TileType::Road; break;
+            case 'w': tile_types[idx] = TileType::Water; break;
+            case 'd': tile_types[idx] = TileType::Desert; break;
+            case 'm': tile_types[idx] = TileType::Mountain; break;
+            case 'f': tile_types[idx] = TileType::Forest; break;
+            case 't': tile_types[idx] = TileType::Town; break;
+            case ' ': break;
+            case '_': break;
+            default: LOG(Debug, "Unknown tile type:", sp::string(char(t)));
+        }
+        if (std::isupper(t)) {
+            for(int x=-1;x<5; x++) {
+                for(int y=-1;y<5; y++) {
+                    if (x < 2 || y < 3)
+                        auto_tiles[idx+x+y*tileset_size.x] = idx;
+                }
+            }
         }
     }
 
@@ -50,14 +69,24 @@ TileType getTileType(int index)
     return TileType::Void;
 }
 
+int getAutoTile(int index)
+{
+    if (index >= 0 && index < tileIndexMax())
+        return auto_tiles[index];
+    return -1;
+}
+
 sp::string getTileTypeName(TileType tt)
 {
     switch(tt) {
     case TileType::Void: return "void";
-    case TileType::Solid: return "solid";
     case TileType::Grass: return "grass";
+    case TileType::Road: return "road";
     case TileType::Water: return "water";
+    case TileType::Desert: return "desert";
     case TileType::Mountain: return "mountain";
+    case TileType::Forest: return "forest";
+    case TileType::Town: return "town";
     case TileType::MAX: return "";
     }
     return "";
