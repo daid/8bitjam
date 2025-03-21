@@ -244,6 +244,23 @@ public:
     }
 };
 
+class BasicNodeRenderPass : public sp::BasicNodeRenderPass
+{
+public:
+    bool onPointerMove(sp::Vector2d position, int id) override { return sp::BasicNodeRenderPass::onPointerMove(fixPos(position), id); }
+    bool onPointerDown(sp::io::Pointer::Button button, sp::Vector2d position, int id) override { return sp::BasicNodeRenderPass::onPointerDown(button, fixPos(position), id); }
+    void onPointerDrag(sp::Vector2d position, int id) override { sp::BasicNodeRenderPass::onPointerDrag(fixPos(position), id); }
+    void onPointerUp(sp::Vector2d position, int id) override { sp::BasicNodeRenderPass::onPointerUp(fixPos(position), id); }
+
+private:
+    sp::Vector2d fixPos(sp::Vector2d p) {
+        auto size = window->getSize();
+        double psx = double(size.y) / 224.0 * 256.0;
+        p.x = p.x * double(size.x) / psx;
+        return p;
+    }
+};
+
 int main(int argc, char** argv)
 {
     sp::P<sp::Engine> engine = new sp::Engine();
@@ -267,7 +284,7 @@ int main(int argc, char** argv)
 
     sp::RenderTexture screen_texture("SCREEN", {256, 224}, false);
     sp::P<sp::SceneGraphicsLayer> scene_layer = new sp::SceneGraphicsLayer(1);
-    scene_layer->addRenderPass(new sp::BasicNodeRenderPass());
+    scene_layer->addRenderPass(new BasicNodeRenderPass());
 #ifdef DEBUG
     scene_layer->addRenderPass(new sp::CollisionRenderPass());
 #endif
