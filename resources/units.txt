@@ -41,7 +41,7 @@
         hp: 12
         sprite.red: sprites/HeroRed.txt
         sprite.blue: sprites/HeroBlue.txt
-        action.0: type=attack range=1 damage=5 type=sword
+        action.0: type=attack range=1 damage=5 class=sword
     }
     [Zeus] {
         name: Zeus
