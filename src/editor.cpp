@@ -13,6 +13,9 @@
 #include <sp2/stringutil/convert.h>
 #include <sp2/io/keyValueTreeSaver.h>
 #include <sp2/io/keyValueTreeLoader.h>
+#include <sp2/window.h>
+
+extern sp::P<sp::Window> window;
 
 
 struct AutoTileData
@@ -201,7 +204,7 @@ public:
     {
         auto p3 = sp::Plane3d({0.0, 0.0, 0.0}, {0.0, 0.0, 1.0}).intersect(ray);
         auto p = sp::Vector2i(std::floor(p3.x), std::floor(p3.y));
-        gui->getWidgetWithID("TOOLTIP")->setAttribute("caption", sp::string(p.x) + "," + sp::string(p.y));
+        gui->getWidgetWithID("TOOLTIP")->setAttribute("caption", sp::string(p.x) + "," + sp::string(p.y) + "\n" + draw_unit);
         return true;
     }
 

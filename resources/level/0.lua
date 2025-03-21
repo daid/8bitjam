@@ -1,3 +1,10 @@
+moveCursor(AphroditePlayer.x, AphroditePlayer.y)
+showMessage([[Aphrodite:
+What is love?
+Oh, baby, don't hurt me
+Don't hurt me no more]], "Aphrodite", 0)
+while messageOpen() do yield() end
+--[[
 showMessage("There he is! Let's get him!", "Hero", 1)
 moveCursor(HeroAI.x, HeroAI.y)
 while messageOpen() do yield() end
@@ -27,3 +34,4 @@ b.move(1, 4)
 while a.isMoving() or b.isMoving() do yield() end
 showMessage("We are here to help!", "Hero", 0)
 moveCursor(a.x, a.y)
+--]]

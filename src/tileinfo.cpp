@@ -41,8 +41,8 @@ void initTileInfo()
         }
         if (std::isupper(t)) {
             for(int x=-1;x<5; x++) {
-                for(int y=-1;y<5; y++) {
-                    if (x < 2 || y < 3)
+                for(int y=-1;y<3; y++) {
+                    if (x < 3 || y < 1)
                         auto_tiles[idx+x+y*tileset_size.x] = idx;
                 }
             }

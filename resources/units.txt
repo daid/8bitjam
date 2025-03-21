@@ -9,14 +9,22 @@
         hp: 10
         sprite.red: sprites/HopliteRed.txt
         sprite.blue: sprites/HopliteBlue.txt
-        action.0: label=Spear type=attack range=1 damage=4 class=spear
+        action.0: label=Lance type=attack range=1 damage=4 class=lance
+        description: The humble Hoplite. A reliable melee unit, not strong or weak to anything. The perfect staple to any force.
+        charmline.0: Oh, I never considered.
+        charmline.1: I lay down my spear for you!
+        charmline.2: Perhaps, once this is over...
     }
     [Pirate] {
         name: Pirate
         hp: 10
         sprite.red: sprites/PirateRed.txt
         sprite.blue: sprites/PirateBlue.txt
-        action.0: label=Sword type=attack range=1 damage=4 class=sword
+        action.0: label=Attack type=attack range=1-2 damage=3 class=ranged
+        description: A soldier of the sea. The Pirate's ability to walk on water gives them an advantage with their ranged attacks. However, their inability to attack adjacent foes makes them weak to melee assaults.
+        charmline.0: I thought my aim was good, you shot my heart.
+        charmline.1: Oh captain my captain!
+        charmline.2: I thought my love was for the sea...
     }
     [Harpy] {
         name: Harpy
@@ -24,8 +32,11 @@
         sprite.red: sprites/HarpyRed.txt
         sprite.blue: sprites/HarpyBlue.txt
         terrain_class: Fly
-        action.0: label=Claw type=attack range=1 damage=3 class=spear
-        action.1: label=Charm type=charm range=1 damage=1
+        action.0: label=Claw type=attack range=1 damage=3 class=lance
+        description: Take to the skies! Though powerful, Harpies should be weary of being caught by arrows, as their flight denies them the defense boosts from terrain. Their stench makes attempts by them to Charm opponents a futile endeavor.
+        charmline.0: You aren't worried I'm going to eat you?
+        charmline.1: Scree?!
+        charmline.2: My nest has been feeling empty lately...
     }
     [Cherub] {
         name: Cherub
@@ -35,6 +46,10 @@
         terrain_class: Fly
         action.0: type=attack range=1 damage=2
         action.1: type=charm range=1-2 damage=1
+        description: The servants of Eros, Cherubs are not very good at fighting. Their boon however boosts the Charm ability of their allies to make any heart fall for them!
+        charmline.0: I go where the love is.
+        charmline.1: Yay! Someone who gets it!
+        charmline.2: Hopefully Eros doesn't get upset...
     }
     [Hero] {
         name: Hero
@@ -42,41 +57,60 @@
         sprite.red: sprites/HeroRed.txt
         sprite.blue: sprites/HeroBlue.txt
         action.0: type=attack range=1 damage=5 class=sword
-    }
-    [Zeus] {
-        name: Zeus
-        hp: 30
-        sprite.red: sprites/ZeusRed.txt
-        sprite.blue: sprites/ZeusBlue.txt
-    }
-    [Heracles] {
-        name: Heracles
-        hp: 15
-        sprite.red: sprites/HeraclesRed.txt
-        sprite.blue: sprites/HeraclesBlue.txt
-    }
-    [Artemis] {
-        name: Artemis
-        hp: 15
-        sprite.red: sprites/ArtemisRed.txt
-        sprite.blue: sprites/ArtemisBlue.txt
+        description: Mounted on horseback, the Hero is incredibly fast, but has difficulty moving through woods. Tough as they are, I've heard they can be hopeless romantics.
+        charmline.0: For you my darling?
+        charmline.1: Give me a token that I may fight for thee!
+        charmline.2: Even my horse likes you.
     }
     [Aphrodite] {
         name: Aphrodite
         hp: 15
         sprite.red: sprites/AphroditeRed.txt
         sprite.blue: sprites/AphroditeBlue.txt
+
+        action.0: type=charm range=1 damage=2
+        description: The Goddess of Love, Aphrodite is no fighter. Be weary, though she may not carry a blade her Charm is unmatched by any other on Olympus. Underestimate her and you may find yourself suddenly surrounded by enemies once friends.
+        charmline.0: I, the Goddess of Love, falling for another? ...
     }
-    [Poseidon] {
-        name: Poseidon
+    [Heracles] {
+        name: Heracles
         hp: 15
-        sprite.red: sprites/PoseidonRed.txt
-        sprite.blue: sprites/PoseidonBlue.txt
+        sprite.red: sprites/HeraclesRed.txt
+        sprite.blue: sprites/HeraclesBlue.txt
+        description: None other can match blows with the great Heracles! One punch is enough to leave most foes reeling, so try not to be in his range lest you find yourself taking an express trip with the ferryman.
+        charmline.0: My fists are mighty, but my heart is my strongest muscle.
+    }
+    [Artemis] {
+        name: Artemis
+        hp: 15
+        sprite.red: sprites/ArtemisRed.txt
+        sprite.blue: sprites/ArtemisBlue.txt
+        description: Goddess of the Hunt, there is no greater shot than Artemis. To fall within her sights is to mean the hunt is on! You are her prey, and she the apex predator. She will be bested by no man!
+        charmline.0: Such skill... Perhaps we could see to a competition some time?
+        charmline.Aphrodite: Ah- erm- heh...!
     }
     [Apollo] {
         name: Apollo
         hp: 15
         sprite.red: sprites/ApolloRed.txt
         sprite.blue: sprites/ApolloBlue.txt
+        description: On his chariot Apollo is known to ride across the sky, dragging the sun in his wake. With great speed and bow in hand there are few places you can hide from the sun.
+        charmline.0: I believed I was the most radiant, but now that I see you...
+    }
+    [Poseidon] {
+        name: Poseidon
+        hp: 15
+        sprite.red: sprites/PoseidonRed.txt
+        sprite.blue: sprites/PoseidonBlue.txt
+        description: God of the Seas, Poseidon is at his strongest on the waves. That does not make him a pushover on land, he's still a god after all, and one of the three brothers to have toppled the Titans.
+        charmline.0: Hook, line and sinker. You've reeled me in.
+    }
+    [Zeus] {
+        name: Zeus
+        hp: 30
+        sprite.red: sprites/ZeusRed.txt
+        sprite.blue: sprites/ZeusBlue.txt
+        description: The all father Zeus, strongest of the Gods of Olympus with the fury of the very skies at his fingertips. Those that do not fall to his bolts are known to fall for his Charm. The ultimate challenge to take your seat among the heavens.
+        charmline.0: You're right. Why are we bothering ourselves with conflict when we could be forging a stronger bond?
     }
 }
