@@ -6,13 +6,15 @@
 #include <sp2/graphics/gui/widget/widget.h>
 #include <sp2/script/environment.h>
 #include "unit.h"
+#include <unordered_set>
+
 
 class Scene;
 extern Scene* scene_instance;
 class Scene : public sp::Scene
 {
 public:
-    Scene();
+    Scene(sp::string start_level);
     ~Scene();
 
     void onUpdate(float delta) override;
@@ -41,6 +43,7 @@ public:
     sp::P<sp::Tilemap> ground_tilemap;
     sp::P<sp::Tilemap> move_overlay;
     sp::Rect2i level_size;
+    sp::string current_level;
     sp::Vector2i cursor_pos;
     sp::P<sp::Node> cursor;
     sp::P<sp::Node> selection_cursor;
@@ -65,10 +68,14 @@ public:
         WaitActionDone,
         ExecuteAITurn,
         WaitAIMove,
+        Defeat,
+        Victory,
     } player_action_state = PlayerActionState::SelectUnit;
 
     sp::P<sp::script::Environment> script_env;
     sp::script::CoroutinePtr script_coroutine;
+
+    std::unordered_set<sp::string> has_heroes;
 };
 
 #endif//MAIN_SCENE_H

@@ -1,10 +1,18 @@
 [EDITOR] {
     stretch: true
 
-    [FILES] {
-        type: listbox
+    { 
         alignment: topleft
-        size: 30, 150
+        layout: vertical
+        [FILES] {
+            type: listbox
+            size: 32, 150
+        }
+        [PLAY] {
+            type: button
+            caption: PLAY
+            size: 32, 16
+        }
     }
 
     [PALETTE] {

@@ -11,6 +11,7 @@
 #include <sp2/graphics/gui/theme.h>
 #include <sp2/graphics/gui/loader.h>
 #include <sp2/graphics/gui/widget/button.h>
+#include <sp2/graphics/gui/widget/togglebutton.h>
 #include <sp2/graphics/gui/widget/keynavigator.h>
 #include <sp2/graphics/scene/graphicslayer.h>
 #include <sp2/graphics/scene/basicnoderenderpass.h>
@@ -47,7 +48,7 @@ void openMainMenu()
     sp::P<sp::gui::Widget> menu = sp::gui::Loader::load("gui/main_menu.gui", "MAIN_MENU");
     menu->getWidgetWithID("START")->setEventCallback([=](sp::Variant v) mutable {
         menu.destroy();
-        new Scene();
+        new Scene("0");
     });
     menu->getWidgetWithID("EDITOR")->setEventCallback([=](sp::Variant v) mutable {
         menu.destroy();
@@ -60,13 +61,6 @@ void openMainMenu()
     menu->getWidgetWithID("CREDITS")->setEventCallback([=](sp::Variant v) mutable {
         menu.destroy();
         openCreditsMenu();
-    });
-    menu->getWidgetWithID("CRT")->setEventCallback([=](sp::Variant v) mutable {
-        if (v.getInteger()) {
-            screen_node->render_data.shader = sp::Shader::get("crt.shader");
-        } else {
-            screen_node->render_data.shader = sp::Shader::get("internal:basic.shader");
-        }
     });
     menu->getWidgetWithID("QUIT")->setEventCallback([](sp::Variant v){
         sp::Engine::getInstance()->shutdown();
@@ -91,6 +85,14 @@ static void openOptionsMenu()
         menu->getWidgetWithID("MUSIC_VOLUME")->getWidgetWithID("VALUE")->setAttribute("caption", sp::string(v.getInteger()) + "%");
         sp::audio::Music::setVolume(v.getInteger());
     });
+    menu->getWidgetWithID("CRT")->setEventCallback([=](sp::Variant v) mutable {
+        if (v.getInteger()) {
+            screen_node->render_data.shader = sp::Shader::get("crt.shader");
+        } else {
+            screen_node->render_data.shader = sp::Shader::get("internal:basic.shader");
+        }
+    });
+    sp::P<sp::gui::ToggleButton>(menu->getWidgetWithID("CRT"))->setActive(screen_node->render_data.shader == sp::Shader::get("crt.shader"));
     menu->getWidgetWithID("CONTROLS")->setEventCallback([=](sp::Variant v) mutable {
         menu.destroy();
         openControlsMenu();
@@ -265,6 +267,11 @@ int main(int argc, char** argv)
 {
     sp::P<sp::Engine> engine = new sp::Engine();
     SP_REGISTER_WIDGET("BorderPanel", BorderPanel);
+    sp::audio::Sound::setVolume(50);
+    sp::audio::Music::setVolume(50);
+#ifdef DEBUG
+    sp::audio::Music::setVolume(0);
+#endif
 
     //Create resource providers, so we can load things.
     sp::io::ResourceProvider::createDefault();

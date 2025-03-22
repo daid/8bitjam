@@ -3,6 +3,8 @@
 #include "healthbareffect.h"
 #include "combatlog.h"
 
+//AAAAAAAAAAAAAAAAHHHHHHHHHHHHH
+void luaShowMessage(sp::string message, sp::string unit, int team);
 
 std::vector<sp::Vector2i> Action::targetOffsets() const
 {
@@ -62,9 +64,9 @@ void Action::execute(sp::P<Unit> source, sp::P<Unit> target, TileType tt) const
                 target->changeTeam(source->team);
                 target->setReady(false);
                 target->heart = target->unit_info->max_heart;
-                addCombatLog(target->unit_info->name + ": " + target->unit_info->getCharmLine());
+                luaShowMessage(target->unit_info->name + ":\n" + target->unit_info->getCharmLine(), target->unit_info->key, int(target->team));
             } else {
-                addCombatLog(target->unit_info->name + " still wants to fight.");
+                addCombatLog(target->unit_info->name + " remains fighting");
             }
         }
         break;

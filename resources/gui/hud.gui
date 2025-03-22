@@ -39,7 +39,9 @@
 
     [MESSAGE_WINDOW] {
         visible: false
-        {
+        size: 256, 48
+        layout: horizontal
+        [IMAGE_CONTAINER] {
             type: BorderPanel
             size: 48, 48
             [IMAGE] {
@@ -51,14 +53,14 @@
         {
             type: BorderPanel
             size: 208, 48
-            position: 48, 0
+            fill_width: true
             padding: 8
             [TEXT] {
                 type: label
                 caption: 
                 line_wrap: true
                 text.alignment: topleft
-                size: 192, 32
+                stretch: true
             }
         }
     }

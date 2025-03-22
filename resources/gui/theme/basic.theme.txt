@@ -12,6 +12,9 @@
         [button.forground.active] {
             color: #000000
         }
+        [mainmenubutton.forground] {
+            color: #FFFFFF
+        }
     }
     [button.background] {
         image: gui/theme/pixel.png
@@ -20,6 +23,11 @@
         sound.hovered: gui/theme/buttonUp.wav
         [button.background.active] {
             color: #FFFFFF
+        }
+        [mainmenubutton.background] {
+            image: gui/theme/Menu_Buttons.png
+            color: #00000000
+            size: 32
         }
     }
     [panel] {

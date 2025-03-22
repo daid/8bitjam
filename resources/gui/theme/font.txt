@@ -4,7 +4,7 @@ glyph_size: 8, 8
 
 line: _
 line: _
-line: _!"#$%&`()*+,-./
+line: _!"#$%&'()*+,-./
 line: 0123456789:;<=>?
 line: @ABCDEFGHIJKLMNO
 line: PQRSTUVWXYZ[\]^_

@@ -43,6 +43,8 @@ void Unit::onUpdate(float delta)
         }
     }
     render_data.order = 500 - getPosition2D().y * 10.0;
+    if (destroy_me)
+        delete this;
 }
 
 void Unit::teleport(sp::Vector2i p)
@@ -123,11 +125,24 @@ void Unit::luaSetY(int y)
     setPosition(sp::Vector2d(pos) + sp::Vector2d(0.5, 0.5));
 }
 
+void Unit::luaDestroy()
+{
+    destroy_me = true;
+}
+
+bool Unit::luaIsPlayer()
+{
+    return team == Team::Player;
+}
+
 void Unit::onRegisterScriptBindings(sp::script::BindingClass& script_binding_class)
 {
     script_binding_class.bind("teleport", &Unit::luaTeleport);
     script_binding_class.bind("move", &Unit::luaMove);
     script_binding_class.bind("isMoving", &Unit::luaIsMoving);
+    script_binding_class.bind("isPlayer", &Unit::luaIsPlayer);
+    script_binding_class.bind("destroy", &Unit::luaDestroy);
+
     script_binding_class.bindProperty("x", &Unit::luaGetX, &Unit::luaSetX);
     script_binding_class.bindProperty("y", &Unit::luaGetY, &Unit::luaSetY);
 }

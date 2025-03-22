@@ -2,6 +2,7 @@
 #include "main.h"
 #include "unitinfo.h"
 #include "tileinfo.h"
+#include "mainScene.h"
 #include <sp2/scene/scene.h>
 #include <sp2/scene/tilemap.h>
 #include <sp2/scene/camera.h>
@@ -112,6 +113,9 @@ public:
 
         auto loader = sp::gui::Loader("gui/editor.gui");
         gui = loader.create("EDITOR");
+        gui->getWidgetWithID("PLAY")->setEventCallback([this](sp::Variant) {
+            start_level = true;
+        });
         auto left_button = loader.create("BTN", gui->getWidgetWithID("PALETTE"));
         left_button->setAttribute("caption", "<");
         left_button->setEventCallback([this](sp::Variant) {
@@ -302,6 +306,11 @@ public:
             delete this;
             return;
         }
+        if (start_level) {
+            saveLevel(current_level_index);
+            new ::Scene(current_level_index);
+            delete this;
+        }
     }
 
     void updateAutoTiles()
@@ -333,6 +342,7 @@ public:
     sp::io::Pointer::Button drag_button;
     sp::Vector3d drag_start;
     sp::string current_level_index = "0";
+    bool start_level = false;
 };
 
 void openEditor()

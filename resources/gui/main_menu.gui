@@ -1,19 +1,12 @@
 [MAIN_MENU] {
+    type: image
+    image: gui/Title_Screen.png
     stretch: true
-
-    [TITLE] {
-        alignment: top
-        type: label
-        theme_data: menu_menu_title
-        caption: Trials\
-            of\
-            Olympus
-        scale_to_text: true
-    }
 
     {
         layout: vertical
-        alignment: bottom
+        alignment: top
+        margin: 112
         
         [START] {
             @ref: MAIN_BUTTON
@@ -28,20 +21,9 @@
             }
         }
 
-        [EDITOR] {
-            @ref: MAIN_BUTTON
-            caption: EDITOR
-        }
-
         [OPTIONS] {
             @ref: MAIN_BUTTON
             caption: OPTIONS
-        }
-
-        [CRT] {
-            @ref: MAIN_BUTTON
-            type: togglebutton
-            caption: CRT
         }
 
         [CREDITS] {
@@ -53,6 +35,13 @@
             @ref: MAIN_BUTTON
             caption: QUIT
         }
+    }
+
+    [EDITOR] {
+        @ref: MAIN_BUTTON
+        caption: EDITOR
+        alignment: bottomright
+        margin: 8
     }
 }
 
@@ -68,6 +57,12 @@
         }
         [MUSIC_VOLUME] {
             @ref: OPTIONS_SLIDER LABEL=Music volume:
+        }
+
+        [CRT] {
+            @ref: MAIN_BUTTON
+            type: togglebutton
+            caption: CRT
         }
         
         [CONTROLS] {
@@ -253,6 +248,13 @@
     size: 64, 16
     margin: 4
     alignment: center
+    style: mainmenubutton
+    {
+        type: image
+        image: gui/theme/Menu_Buttons.png
+        size: 64, 16
+        order: -10
+    }
 }
 [@OPTIONS_SLIDER] {
     layout: vertical

@@ -31,6 +31,7 @@ public:
     int hp = 5;
     int heart = 3;
     Team team = Team::Player;
+    bool destroy_me = false;
 
     std::vector<sp::Vector2i> move_path;
     sp::Timer move_timer;
@@ -42,6 +43,8 @@ public:
     void luaSetX(int x);
     int luaGetY() const;
     void luaSetY(int y);
+    void luaDestroy();
+    bool luaIsPlayer();
 protected:
     void onRegisterScriptBindings(sp::script::BindingClass& script_binding_class) override;
 };

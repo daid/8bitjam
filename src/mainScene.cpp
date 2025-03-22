@@ -45,7 +45,7 @@ float getAStarDistance(sp::Vector2i a, sp::Vector2i b)
     return (sp::Vector2f(a) - sp::Vector2f(b)).length() * 0.1f;
 }
 
-Scene::Scene()
+Scene::Scene(sp::string start_level)
 : sp::Scene("MAIN")
 {
     scene_instance = this;
@@ -53,11 +53,12 @@ Scene::Scene()
 
     hud = sp::gui::Loader::load("gui/hud.gui", "HUD");
 
-    loadLevel("0");
+    loadLevel(start_level);
 }
 
 Scene::~Scene()
 {
+    script_env.destroy();
     hud.destroy();
     action_gui.destroy();
     unitinfo_gui.destroy();
@@ -68,6 +69,9 @@ void Scene::onUpdate(float delta)
 {
     int input = 0;
     int hold = 0;
+    if (hud->getWidgetWithID("MESSAGE_WINDOW")->isVisible()) {
+        if (controller.a.getDown()) hud->getWidgetWithID("MESSAGE_WINDOW")->hide();
+    }
     if (unitinfo_gui) {
         if (controller.a.getDown()) unitinfo_gui.destroy();
         if (controller.b.getDown()) unitinfo_gui.destroy();
@@ -98,9 +102,6 @@ void Scene::onUpdate(float delta)
 
         if (controller.a.getDown()) activateCursor();
         if (controller.b.getDown()) deactivateCursor();
-    }
-    if (hud->getWidgetWithID("MESSAGE_WINDOW")->isVisible()) {
-        if (controller.a.getDown()) hud->getWidgetWithID("MESSAGE_WINDOW")->hide();
     }
 
     switch(player_action_state)
@@ -188,12 +189,20 @@ void Scene::onUpdate(float delta)
                         unit->setReady(true);
                 }
                 player_action_state = PlayerActionState::ExecuteAITurn;
-                ai_timer.start(0.1);
+                ai_timer.start(1.0);
+
+                auto res = script_env->callCoroutine("onTurnEnd");
+                if (res.isErr()) {
+                    LOG(Debug, "Lua error:", res.error());
+                    hud->getWidgetWithID("LUA_ERROR")->setAttribute("caption", res.error());
+                } else {
+                    script_coroutine = res.value();
+                }
             }
         }
         break;
     case PlayerActionState::ExecuteAITurn:
-        if (ai_timer.isExpired()) {
+        if (ai_timer.isExpired() && !script_coroutine) {
             checkDeadUnits();
 
             sp::P<Unit> ai_unit;
@@ -213,6 +222,13 @@ void Scene::onUpdate(float delta)
                     if (unit && unit->team != Team::Player)
                         unit->setReady(true);
                 }
+                auto res = script_env->callCoroutine("onTurnStart");
+                if (res.isErr()) {
+                    LOG(Debug, "Lua error:", res.error());
+                    hud->getWidgetWithID("LUA_ERROR")->setAttribute("caption", res.error());
+                } else {
+                    script_coroutine = res.value();
+                }
             }
         }
         break;
@@ -224,6 +240,21 @@ void Scene::onUpdate(float delta)
             if (target_unit && selected_action) {
                 selected_action->execute(selected_unit, target_unit, getTileType(ground_tilemap->getTileIndex(target_unit->pos)));
             }
+        }
+        break;
+    case PlayerActionState::Defeat:
+        if (!script_coroutine) {
+            loadLevel(current_level);
+        }
+        break;
+    case PlayerActionState::Victory:
+        if (!script_coroutine) {
+            has_heroes.clear();
+            for(sp::P<Unit> unit : getRoot()->getChildren()) {
+                if (unit && unit->team == Team::Player)
+                    has_heroes.insert(unit->unit_info->key);
+            }
+            loadLevel(sp::string(sp::stringutil::convert::toInt(current_level) + 1));
         }
         break;
     }
@@ -263,6 +294,10 @@ void Scene::onUpdate(float delta)
         camera_pos.y = std::min(camera_pos.y, double(level_size.position.y + level_size.size.y) - 7);
     }
     getCamera()->setPosition(camera_pos);
+    if (camera_pos.y < cursor->getPosition2D().y - 3.0)
+        hud->getWidgetWithID("MESSAGE_WINDOW")->setAttribute("position", "0, 160");
+    else
+        hud->getWidgetWithID("MESSAGE_WINDOW")->setAttribute("position", "0, 0");
 }
 
 void Scene::onFixedUpdate()
@@ -298,11 +333,14 @@ void luaShowMessage(sp::string message, sp::string unit, int team)
     auto unitinfo = UnitInfo::get(unit);
     auto image = scene_instance->hud->getWidgetWithID("MESSAGE_WINDOW")->getWidgetWithID("IMAGE");
     if (unitinfo) {
+        scene_instance->hud->getWidgetWithID("MESSAGE_WINDOW")->getWidgetWithID("IMAGE_CONTAINER")->show();
         image->render_data.scale = {16, 16, 16};
         image->setAnimation(sp::SpriteAnimation::load(unitinfo->sprite[team]));
+        image->animationSetFlags(sp::SpriteAnimation::FlipFlag);
         image->animationPlay("Ready");
         image->show();
     } else {
+        scene_instance->hud->getWidgetWithID("MESSAGE_WINDOW")->getWidgetWithID("IMAGE_CONTAINER")->hide();
         image->hide();
     }
 }
@@ -329,8 +367,41 @@ sp::P<Unit> luaGetUnit(int x, int y)
     return scene_instance->getUnitAt({x, y});
 }
 
+int luaAllUnits(lua_State* L)
+{
+    lua_newtable(L);
+    int index = 1;
+    int team_nr = luaL_checkinteger(L, 1);
+    Team team = team_nr == 0 ? Team::Player : Team::AI;
+    for(sp::P<Unit> unit : scene_instance->getRoot()->getChildren()) {
+        if (!unit) continue;
+        if (unit->team != team) continue;
+        sp::script::pushToLua(L, unit);
+        lua_seti(L, -2, index);
+        index++;
+    }
+    return 1;
+}
+
+bool luaHasHero(sp::string name)
+{
+    return scene_instance->has_heroes.find(name) != scene_instance->has_heroes.end();
+}
+
+void luaDefeat()
+{
+    scene_instance->player_action_state = Scene::PlayerActionState::Defeat;
+}
+
+void luaVictory()
+{
+    scene_instance->player_action_state = Scene::PlayerActionState::Victory;
+}
+
 void Scene::loadLevel(const sp::string& name)
 {
+    current_level = name;
+    player_action_state = PlayerActionState::SelectUnit;
     auto kvt = sp::io::KeyValueTreeLoader::loadFile("resources/level/" + name + ".txt");
     for(auto node : getRoot()->getChildren())
         node.destroy();
@@ -376,6 +447,10 @@ void Scene::loadLevel(const sp::string& name)
     script_env->setGlobal("messageOpen", luaMessageOpen);
     script_env->setGlobal("createUnit", luaCreateUnit);
     script_env->setGlobal("getUnitAt", luaGetUnit);
+    script_env->setGlobal("allUnits", luaAllUnits);
+    script_env->setGlobal("hasHero", luaHasHero);
+    script_env->setGlobal("defeat", luaDefeat);
+    script_env->setGlobal("victory", luaVictory);
     for(sp::P<Unit> unit : getRoot()->getChildren()) {
         if (unit && unit->team == Team::Player) script_env->setGlobal(unit->unit_info->key + "Player", unit);
         if (unit && unit->team == Team::AI) script_env->setGlobal(unit->unit_info->key + "AI", unit);
@@ -450,6 +525,8 @@ void Scene::activateCursor()
     case PlayerActionState::WaitActionDone: break;
     case PlayerActionState::ExecuteAITurn: break;
     case PlayerActionState::WaitAIMove: break;
+    case PlayerActionState::Defeat: break;
+    case PlayerActionState::Victory: break;
     }
 }
 
@@ -521,6 +598,8 @@ void Scene::deactivateCursor()
     case PlayerActionState::WaitActionDone: break;
     case PlayerActionState::ExecuteAITurn: break;
     case PlayerActionState::WaitAIMove: break;
+    case PlayerActionState::Defeat: break;
+    case PlayerActionState::Victory: break;
     }
 }
 

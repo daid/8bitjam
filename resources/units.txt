@@ -55,8 +55,10 @@
     [Hero] {
         name: Hero
         hp: 12
+        move: 6
         sprite.red: sprites/HeroRed.txt
         sprite.blue: sprites/HeroBlue.txt
+        terrain_class: Mounted
         action.0: type=attack range=1 damage=5 class=sword
         description: Mounted on horseback, the Hero is incredibly fast, but has difficulty moving through woods. Tough as they are, I've heard they can be hopeless romantics.
         charmline.0: For you my darling?
@@ -76,6 +78,7 @@
         name: Heracles
         hp: 15
         move: 4
+        heart: 7
         sprite.red: sprites/HeraclesRed.txt
         sprite.blue: sprites/HeraclesBlue.txt
         action.0: label=Punch type=attack range=1 damage=5 class=punch
@@ -102,6 +105,7 @@
         move: 8
         sprite.red: sprites/ApolloRed.txt
         sprite.blue: sprites/ApolloBlue.txt
+        terrain_class: Mounted
         action.0: label=Attack type=attack range=1-2 damage=3 class=ranged
         action.1: type=charm range=1 damage=1
         description: On his chariot Apollo is known to ride across the sky, dragging the sun in his wake. With great speed and bow in hand there are few places you can hide from the sun.
@@ -110,16 +114,19 @@
     [Poseidon] {
         name: Poseidon
         hp: 15
-        heart: 5
+        heart: 7
         sprite.red: sprites/PoseidonRed.txt
         sprite.blue: sprites/PoseidonBlue.txt
+        terrain_class: Poseidon
+        action.0: label=Trident type=attack range=1 damage=4 class=lance
+        action.1: type=charm range=1 damage=1
         description: God of the Seas, Poseidon is at his strongest on the waves. That does not make him a pushover on land, he's still a god after all, and one of the three brothers to have toppled the Titans.
         charmline.0: Hook, line and sinker. You've reeled me in.
     }
     [Zeus] {
         name: Zeus
         hp: 30
-        heart: 10
+        heart: 12
         sprite.red: sprites/ZeusRed.txt
         sprite.blue: sprites/ZeusBlue.txt
         description: The all father Zeus, strongest of the Gods of Olympus with the fury of the very skies at his fingertips. Those that do not fall to his bolts are known to fall for his Charm. The ultimate challenge to take your seat among the heavens.
