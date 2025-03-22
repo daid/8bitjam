@@ -222,7 +222,7 @@ void Scene::onUpdate(float delta)
             selected_unit->setReady(false);
             player_action_state = PlayerActionState::ExecuteAITurn;
             if (target_unit && selected_action) {
-                selected_action->execute(selected_unit, target_unit);
+                selected_action->execute(selected_unit, target_unit, getTileType(ground_tilemap->getTileIndex(target_unit->pos)));
             }
         }
         break;
@@ -236,6 +236,18 @@ void Scene::onUpdate(float delta)
         hud->getWidgetWithID("HP")->setAttribute("caption", "-");
         hud->getWidgetWithID("NAME")->setAttribute("caption", "");
     }
+
+    if (combat_log_timer.isExpired() || !combat_log_timer.isRunning()) {
+        auto log_entry = getCombatLog();
+        if (log_entry != "") {
+            hud->getWidgetWithID("COMBAT_LOG")->setAttribute("caption", log_entry);
+            hud->getWidgetWithID("STATUS_LINE")->hide();
+            combat_log_timer.start(1.5);
+        } else {
+            hud->getWidgetWithID("STATUS_LINE")->show();
+        }
+    }
+    
     auto camera_pos = sp::Vector2d(cursor_pos);
     if (level_size.size.x < 17) {
         camera_pos.x = double(level_size.position.x) + double(level_size.size.x) * 0.5;
@@ -431,7 +443,7 @@ void Scene::activateCursor()
                 target_unit = target;
                 selected_unit->pos = move_target_position;
                 player_action_state = PlayerActionState::WaitActionDone;
-                selected_action->execute(selected_unit, target);
+                selected_action->execute(selected_unit, target, getTileType(ground_tilemap->getTileIndex(cursor_pos)));
             }
         }
         break;

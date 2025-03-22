@@ -10,8 +10,12 @@
     town: 1, 1
     [Basic] {
     }
+    [Sealegs] {
+        water: 2, 2
+    }
     [Fly] {
         water: 1, 0
         mountain: 1, 0
+        forest: 1, 0
     }
 }

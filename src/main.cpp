@@ -176,7 +176,7 @@ static void openControlsMenu()
         sp::P<sp::gui::Widget> keybinding_menu = loader.create("@CONTROLS_KEYBINDING", menu->getWidgetWithID("KEYS"));
         keybinding_menu->getWidgetWithID("NAME")->setAttribute("caption", keybinding->getLabel() + ":");
         int done = 0;
-        for(int n=0; n<4; n++)
+        for(int n=0; n<3; n++)
         {
             auto button = loader.create("@CONTROLS_KEYBINDING_BUTTON", keybinding_menu);
             button->setAttribute("caption", "");

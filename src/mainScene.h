@@ -47,6 +47,7 @@ public:
     sp::P<sp::gui::Widget> action_gui;
     sp::P<sp::gui::Widget> hud;
     sp::P<sp::gui::Widget> unitinfo_gui;
+    sp::Timer combat_log_timer;
 
     sp::P<Unit> selected_unit;
     sp::Vector2i move_target_position;

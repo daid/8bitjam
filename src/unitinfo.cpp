@@ -3,6 +3,7 @@
 #include <sp2/io/resourceProvider.h>
 #include <sp2/io/keyValueTreeLoader.h>
 #include <sp2/stringutil/convert.h>
+#include <sp2/random.h>
 
 
 static std::vector<UnitInfo*> unit_vector;
@@ -24,6 +25,9 @@ void UnitInfo::init()
         info->max_hp = sp::stringutil::convert::toInt(data["hp"]);
         info->max_heart = sp::stringutil::convert::toInt(data["heart"]);
         info->terrain_class = getTerrainClass(data["terrain_class"]);
+        for(int n=0; data.find("charmline." + sp::string(n)) != data.end(); n++) {
+            info->charm_lines.push_back(data["charmline." + sp::string(n)]);
+        }
         for(int n=0; data.find("action." + sp::string(n)) != data.end(); n++) {
             info->actions.emplace_back();
             auto& action = info->actions.back();
@@ -54,6 +58,12 @@ const UnitInfo* UnitInfo::get(const sp::string& name)
     auto it = unit_mapping.find(name);
     if (it != unit_mapping.end()) return it->second;
     return nullptr;
+}
+
+sp::string UnitInfo::getCharmLine() const
+{
+    if (charm_lines.empty()) return "I [HEART] you";
+    return charm_lines[sp::irandom(0, charm_lines.size()-1)];
 }
 
 std::vector<UnitInfo> UnitInfo::getAll()

@@ -84,9 +84,9 @@
             keybinding: ESCAPE
             {
                 type: keynavigator
-                margin: -5
-                stretch: true
-                select: PRIMARY
+                size: 16, 16
+                select: A
+                visible: true
             }
         }
     }
@@ -109,9 +109,9 @@
             keybinding: ESCAPE
             {
                 type: keynavigator
-                margin: -5
-                stretch: true
-                select: PRIMARY
+                size: 16, 16
+                select: A
+                visible: true
             }
         }
     }
@@ -236,9 +236,9 @@
             keybinding: ESCAPE
             {
                 type: keynavigator
-                margin: -5
-                stretch: true
-                select: PRIMARY
+                size: 16, 16
+                select: A
+                visible: true
             }
         }
     }
@@ -278,19 +278,18 @@
     [NAME] {
         type: label
         fill_height: true
-        size: 100, 20
+        size: 64, 16
         caption: ...
-        text.size: 20
+        text.size: 8
         text.alignment: right
-        margin: 0, 5, 0, 0
     }
 }
 [@CONTROLS_KEYBINDING_BUTTON] {
     type: button
-    size: 100, 20
+    size: 64, 16
     caption: ...
-    text.size: 15
-    margin: 2, 0
+    text.size: 8
+    margin: 4, 0
 }
 [@CREDITS_SECTION] {
     type: label

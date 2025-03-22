@@ -3,6 +3,7 @@
 #include <sp2/string.h>
 #include <sp2/math/vector2.h>
 #include <sp2/pointer.h>
+#include "tileinfo.h"
 
 
 class Unit;
@@ -25,5 +26,5 @@ public:
     bool requireTarget() const;
     bool isValidTarget(sp::P<Unit> source, sp::P<Unit> target) const;
 
-    void execute(sp::P<Unit> source, sp::P<Unit> target) const;
+    void execute(sp::P<Unit> source, sp::P<Unit> target, TileType tt) const;
 };

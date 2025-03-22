@@ -6,7 +6,7 @@
         size: 256, 16
         layout: vertical
 
-        {
+        [STATUS_LINE] {
             layout: horizontal
             {
                 type: label
@@ -27,6 +27,13 @@
                 size: 64, 8
                 text.alignment: left
             }
+        }
+        [COMBAT_LOG] {
+            type: label
+            size: 224, 16
+            text.alignment: topleft
+            caption: 
+            line_wrap: true
         }
     }
 

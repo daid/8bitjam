@@ -25,6 +25,7 @@
         charmline.0: I thought my aim was good, you shot my heart.
         charmline.1: Oh captain my captain!
         charmline.2: I thought my love was for the sea...
+        terrain_class: Sealegs
     }
     [Harpy] {
         name: Harpy
@@ -67,7 +68,6 @@
         hp: 15
         sprite.red: sprites/AphroditeRed.txt
         sprite.blue: sprites/AphroditeBlue.txt
-
         action.0: type=charm range=1 damage=2
         description: The Goddess of Love, Aphrodite is no fighter. Be weary, though she may not carry a blade her Charm is unmatched by any other on Olympus. Underestimate her and you may find yourself suddenly surrounded by enemies once friends.
         charmline.0: I, the Goddess of Love, falling for another? ...
@@ -75,14 +75,18 @@
     [Heracles] {
         name: Heracles
         hp: 15
+        move: 4
         sprite.red: sprites/HeraclesRed.txt
         sprite.blue: sprites/HeraclesBlue.txt
+        action.0: label=Punch type=attack range=1 damage=5 class=punch
+        action.0: type=charm range=1 damage=1
         description: None other can match blows with the great Heracles! One punch is enough to leave most foes reeling, so try not to be in his range lest you find yourself taking an express trip with the ferryman.
         charmline.0: My fists are mighty, but my heart is my strongest muscle.
     }
     [Artemis] {
         name: Artemis
-        hp: 15
+        hp: 10
+        heart: 5
         sprite.red: sprites/ArtemisRed.txt
         sprite.blue: sprites/ArtemisBlue.txt
         action.0: label=Attack type=attack range=1-3 damage=4 class=ranged
@@ -93,15 +97,20 @@
     }
     [Apollo] {
         name: Apollo
-        hp: 15
+        hp: 12
+        heart: 5
+        move: 8
         sprite.red: sprites/ApolloRed.txt
         sprite.blue: sprites/ApolloBlue.txt
+        action.0: label=Attack type=attack range=1-2 damage=4 class=ranged
+        action.1: type=charm range=1 damage=1
         description: On his chariot Apollo is known to ride across the sky, dragging the sun in his wake. With great speed and bow in hand there are few places you can hide from the sun.
         charmline.0: I believed I was the most radiant, but now that I see you...
     }
     [Poseidon] {
         name: Poseidon
         hp: 15
+        heart: 5
         sprite.red: sprites/PoseidonRed.txt
         sprite.blue: sprites/PoseidonBlue.txt
         description: God of the Seas, Poseidon is at his strongest on the waves. That does not make him a pushover on land, he's still a god after all, and one of the three brothers to have toppled the Titans.
@@ -110,6 +119,7 @@
     [Zeus] {
         name: Zeus
         hp: 30
+        heart: 10
         sprite.red: sprites/ZeusRed.txt
         sprite.blue: sprites/ZeusBlue.txt
         description: The all father Zeus, strongest of the Gods of Olympus with the fury of the very skies at his fingertips. Those that do not fall to his bolts are known to fall for his Charm. The ultimate challenge to take your seat among the heavens.
