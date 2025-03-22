@@ -1,0 +1,46 @@
+[UNITINFO] {
+    type: BorderPanel
+    size: 256, 208
+
+    {
+        type: BorderPanel
+        size: 48, 48
+        position: 16, 16
+        [IMAGE] {
+            type: image
+            size: 1, 1
+            alignment: center
+        }
+    }
+
+    [NAME] {
+        type: label
+        size: 128, 8
+        position: 72, 24
+        caption: NAME_OF_UNIT
+        text.alignment: left
+    }
+    [HP] {
+        type: label
+        size: 128, 8
+        position: 72, 32
+        caption: [HEART]:10/10
+        text.alignment: left
+    }
+    [ACTIONS] {
+        type: label
+        size: 128, 16
+        position: 72, 40
+        caption: A
+        text.alignment: topleft
+    }
+
+    [DESCRIPTION] {
+        type: label
+        size: 224, 128
+        position: 16, 72
+        caption: Goddess of the Hunt, there is no greater shot than Artemis. To fall within her sights is to mean the hunt is on! You are her prey, and she the apex predator. She will be bested by no man!
+        text.alignment: topleft
+        word_wrap: true
+    }
+}

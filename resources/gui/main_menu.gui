@@ -5,7 +5,9 @@
         alignment: top
         type: label
         theme_data: menu_menu_title
-        caption: Trials of Olympus
+        caption: Trials\
+            of\
+            Olympus
         scale_to_text: true
     }
 

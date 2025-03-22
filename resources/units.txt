@@ -85,6 +85,8 @@
         hp: 15
         sprite.red: sprites/ArtemisRed.txt
         sprite.blue: sprites/ArtemisBlue.txt
+        action.0: label=Attack type=attack range=1-3 damage=4 class=ranged
+        action.1: type=charm range=1 damage=1
         description: Goddess of the Hunt, there is no greater shot than Artemis. To fall within her sights is to mean the hunt is on! You are her prey, and she the apex predator. She will be bested by no man!
         charmline.0: Such skill... Perhaps we could see to a competition some time?
         charmline.Aphrodite: Ah- erm- heh...!

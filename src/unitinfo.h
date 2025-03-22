@@ -9,6 +9,7 @@ class UnitInfo
 public:
     sp::string key;
     sp::string name;
+    sp::string description;
     sp::string sprite[2];
     int move = 5;
     int max_hp = 5;

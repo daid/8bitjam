@@ -16,12 +16,13 @@
                 type: keynavigator
                 select: A
                 size: 16, 16
+                visible: true
             }
         }
 
         [BACK] {
             @ref: BUTTON
-            caption: Return to game
+            caption: Return
         }
     }
 }

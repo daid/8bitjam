@@ -59,6 +59,8 @@ Scene::Scene()
 Scene::~Scene()
 {
     hud.destroy();
+    action_gui.destroy();
+    unitinfo_gui.destroy();
     sp::Scene::get("INGAME_MENU")->disable();
 }
 
@@ -66,7 +68,10 @@ void Scene::onUpdate(float delta)
 {
     int input = 0;
     int hold = 0;
-    if (!script_coroutine && !hud->getWidgetWithID("MESSAGE_WINDOW")->isVisible()) {
+    if (unitinfo_gui) {
+        if (controller.a.getDown()) unitinfo_gui.destroy();
+        if (controller.b.getDown()) unitinfo_gui.destroy();
+    } else if (!script_coroutine && !hud->getWidgetWithID("MESSAGE_WINDOW")->isVisible()) {
         if (controller.left.getDown()) input |= 0x01;
         if (controller.right.getDown()) input |= 0x02;
         if (controller.up.getDown()) input |= 0x04;
@@ -418,8 +423,11 @@ void Scene::activateCursor()
     case PlayerActionState::SelectAction: break;
     case PlayerActionState::SelectTarget:
         {
+            auto diff = cursor_pos - move_target_position;
+            auto dist = std::abs(diff.x) + std::abs(diff.y);
             auto target = getUnitAt(cursor_pos);
-            if (selected_action->isValidTarget(selected_unit, target)) {
+
+            if (dist >= selected_action->min_range && dist <= selected_action->max_range && selected_action->isValidTarget(selected_unit, target)) {
                 target_unit = target;
                 selected_unit->pos = move_target_position;
                 player_action_state = PlayerActionState::WaitActionDone;
@@ -437,7 +445,48 @@ void Scene::deactivateCursor()
 {
     switch(player_action_state)
     {
-    case PlayerActionState::SelectUnit: break;
+    case PlayerActionState::SelectUnit:
+        if (auto unit = getUnitAt(cursor_pos)) {
+            unitinfo_gui = sp::gui::Loader::load("gui/unitinfo.gui", "UNITINFO");
+            unitinfo_gui->getWidgetWithID("NAME")->setAttribute("caption", unit->unit_info->name);
+            sp::string hp_info = "[HEART]:" + sp::string(unit->hp) + "/" + sp::string(unit->unit_info->max_hp) + " ";
+            hp_info += "[CHARM]:";
+            sp::string hp0 = "[HP0]";
+            sp::string hp1 = "[HP1]";
+            if (unit->team == Team::AI) std::swap(hp0, hp1);
+            for(int n=0; n<unit->unit_info->max_heart; n++) {
+                if (n < unit->heart)
+                    hp_info += hp0;
+                else
+                    hp_info += hp1;
+            }
+            unitinfo_gui->getWidgetWithID("HP")->setAttribute("caption", hp_info);
+            unitinfo_gui->getWidgetWithID("DESCRIPTION")->setAttribute("caption", unit->unit_info->description);
+            sp::string action_info;
+            for(const auto& action : unit->unit_info->actions) {
+                if (action.type == Action::Type::Attack) {
+                    action_info += action.label + ": " + sp::string(action.damage) + "dmg";
+                    if (action.max_range > 1) {
+                        action_info += " " + sp::string(action.max_range) + "range";
+                    }
+                    action_info += "\n";
+                } if (action.type == Action::Type::Charm) {
+                    action_info += action.label + ": " + sp::string(action.damage) + "charm";
+                    if (action.max_range > 1) {
+                        action_info += " " + sp::string(action.max_range) + "range";
+                    }
+                    action_info += "\n";
+                }
+            }
+            unitinfo_gui->getWidgetWithID("ACTIONS")->setAttribute("caption", action_info);
+
+            auto image = unitinfo_gui->getWidgetWithID("IMAGE");
+            image->render_data.scale = {16, 16, 16};
+            image->setAnimation(sp::SpriteAnimation::load(unit->unit_info->sprite[int(unit->team)]));
+            image->animationPlay("Ready");
+            image->show();
+        }
+        break;
     case PlayerActionState::SelectMoveTarget:
         player_action_state = PlayerActionState::SelectUnit;
         selection_cursor.destroy();

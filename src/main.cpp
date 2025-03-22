@@ -297,7 +297,8 @@ int main(int argc, char** argv)
     screen_node = new sp::Node(ss->getRoot());
     screen_node->render_data.type = sp::RenderData::Type::Normal;
     screen_node->render_data.mesh = sp::MeshData::createQuad({256.0f, 224.0f}, {0.0f, 1.0f}, {1.0f, 0.0f});
-    screen_node->render_data.shader = sp::Shader::get("internal:basic.shader");
+    //screen_node->render_data.shader = sp::Shader::get("internal:basic.shader");
+    screen_node->render_data.shader = sp::Shader::get("crt.shader");
     screen_node->render_data.texture = &screen_texture;
 
     sp::P<sp::SceneGraphicsLayer> screen_layer = new sp::SceneGraphicsLayer(2);

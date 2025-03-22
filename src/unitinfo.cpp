@@ -17,6 +17,7 @@ void UnitInfo::init()
         info->key = key;
         info->name = key;
         if (data.find("name") != data.end()) info->name = data["name"];
+        info->description = data["description"];
         info->sprite[0] = data["sprite.red"];
         info->sprite[1] = data["sprite.blue"];
         info->move = sp::stringutil::convert::toInt(data["move"]);

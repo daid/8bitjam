@@ -46,6 +46,7 @@ public:
     sp::P<sp::Node> selection_cursor;
     sp::P<sp::gui::Widget> action_gui;
     sp::P<sp::gui::Widget> hud;
+    sp::P<sp::gui::Widget> unitinfo_gui;
 
     sp::P<Unit> selected_unit;
     sp::Vector2i move_target_position;
