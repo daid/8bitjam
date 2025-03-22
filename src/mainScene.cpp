@@ -242,7 +242,7 @@ void Scene::onUpdate(float delta)
         if (log_entry != "") {
             hud->getWidgetWithID("COMBAT_LOG")->setAttribute("caption", log_entry);
             hud->getWidgetWithID("STATUS_LINE")->hide();
-            combat_log_timer.start(1.5);
+            combat_log_timer.start(3.5);
         } else {
             hud->getWidgetWithID("STATUS_LINE")->show();
         }

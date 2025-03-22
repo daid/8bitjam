@@ -22,6 +22,7 @@
             {
                 type: keynavigator
                 size: 16, 16
+                position: -8, 0
                 select: A
                 visible: true
             }
@@ -85,6 +86,7 @@
             {
                 type: keynavigator
                 size: 16, 16
+                position: -8, 0
                 select: A
                 visible: true
             }
@@ -110,6 +112,7 @@
             {
                 type: keynavigator
                 size: 16, 16
+                position: -8, 0
                 select: A
                 visible: true
             }
@@ -237,6 +240,7 @@
             {
                 type: keynavigator
                 size: 16, 16
+                position: -8, 0
                 select: A
                 visible: true
             }

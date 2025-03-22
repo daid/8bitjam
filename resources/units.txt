@@ -102,7 +102,7 @@
         move: 8
         sprite.red: sprites/ApolloRed.txt
         sprite.blue: sprites/ApolloBlue.txt
-        action.0: label=Attack type=attack range=1-2 damage=4 class=ranged
+        action.0: label=Attack type=attack range=1-2 damage=3 class=ranged
         action.1: type=charm range=1 damage=1
         description: On his chariot Apollo is known to ride across the sky, dragging the sun in his wake. With great speed and bow in hand there are few places you can hide from the sun.
         charmline.0: I believed I was the most radiant, but now that I see you...

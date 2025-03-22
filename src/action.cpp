@@ -61,6 +61,7 @@ void Action::execute(sp::P<Unit> source, sp::P<Unit> target, TileType tt) const
             if (target->heart == 0) {
                 target->changeTeam(source->team);
                 target->setReady(false);
+                target->heart = target->unit_info->max_heart;
                 addCombatLog(target->unit_info->name + ": " + target->unit_info->getCharmLine());
             } else {
                 addCombatLog(target->unit_info->name + " still wants to fight.");
