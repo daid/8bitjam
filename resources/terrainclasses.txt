@@ -8,18 +8,20 @@
     mountain: 5, 1
     forest: 2, 1
     town: 1, 1
+    wall: 1000, 0
     [Basic] {
     }
     [Mounted] {
         forest: 3, 1
     }
     [Sealegs] {
-        water: 2, 2
+        water: 2, 1
     }
     [Fly] {
         water: 1, 0
         mountain: 1, 0
         forest: 1, 0
+        wall: 1, 0
     }
 
     [Poseidon] {

@@ -35,6 +35,7 @@ void initTileInfo()
             case 'm': tile_types[idx] = TileType::Mountain; break;
             case 'f': tile_types[idx] = TileType::Forest; break;
             case 't': tile_types[idx] = TileType::Town; break;
+            case '#': tile_types[idx] = TileType::Wall; break;
             case ' ': break;
             case '_': break;
             default: LOG(Debug, "Unknown tile type:", sp::string(char(t)));
@@ -87,6 +88,7 @@ sp::string getTileTypeName(TileType tt)
     case TileType::Mountain: return "mountain";
     case TileType::Forest: return "forest";
     case TileType::Town: return "town";
+    case TileType::Wall: return "wall";
     case TileType::MAX: return "";
     }
     return "";

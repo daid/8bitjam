@@ -24,6 +24,8 @@ public:
     bool isEnemy(sp::P<Unit> other);
     void changeTeam(Team new_team);
 
+    sp::string getCharmInfo();
+
     bool ready = true;
     const UnitInfo* unit_info = nullptr;
     sp::Vector2i pos;

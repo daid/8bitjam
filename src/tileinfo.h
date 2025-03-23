@@ -12,6 +12,7 @@ enum class TileType
     Mountain,
     Forest,
     Town,
+    Wall,
 
     MAX
 };

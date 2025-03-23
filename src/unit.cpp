@@ -82,6 +82,21 @@ void Unit::changeTeam(Team new_team)
     animationPlay("Ready");
 }
 
+sp::string Unit::getCharmInfo()
+{
+    sp::string hp_info = "[CHARM]:";
+    sp::string hp0 = "[HP0]";
+    sp::string hp1 = "[HP1]";
+    if (team == Team::AI) std::swap(hp0, hp1);
+    for(int n=0; n<unit_info->max_heart; n++) {
+        if (n < heart)
+            hp_info += hp0;
+        else
+            hp_info += hp1;
+    }
+    return hp_info;
+}
+
 void Unit::luaTeleport(int x, int y)
 {
     teleport({x, y});

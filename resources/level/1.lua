@@ -39,7 +39,7 @@ Who dares to encroach on my seas?]])
 heroTalk(AphroditePlayer, "Aphrodite", 0, [[Aphrodite:
 Lovely...]])
 heroTalk(PoseidonAI, "Poseidon", 1, [[Poseidon:
-Aphrodite? What are you doing here my niece?]])
+Aphrodite? What are you doing here, my niece?]])
 heroTalk(AphroditePlayer, "Aphrodite", 0, [[Aphrodite:
 Passing to my temple.]])
 heroTalk(PoseidonAI, "Poseidon", 1, [[Poseidon:
@@ -55,27 +55,22 @@ You can count on me!]])
 
 moveCursor(AphroditePlayer.x, AphroditePlayer.y)
 showMessage([[Tutorial:
-Hold the temple across the river for 5 turns, or Charm Poseidon.]], "", 0)
+Hold the temple across the river for 3 turns.]], "", 0)
 while messageOpen() do yield() end
 
 hold_temple_count = 0
 function onTurnEnd()
-    if not AphroditePlayer.valid then
-        showMessage([[You lost...]], "", 0)
-        while messageOpen() do yield() end
-        defeat()
-    end
     if getUnitAt(5, 2) and getUnitAt(5, 2).isPlayer() then
         hold_temple_count = hold_temple_count + 1
     else
         hold_temple_count = 0
     end
-    if hold_temple_count > 5 or (PoseidonAI.valid and PoseidonAI.isPlayer()) then
+    if hold_temple_count > 3 then
         a = spawnUnitNear(5, 2, "Cherub", 0)
         b = spawnUnitNear(5, 2, "Cherub", 0)
         moveCursor(a.x, a.y)
         showMessage([[Cherub:
-Greetings Lady Aphrodite!]], "Cherub", 0)
+Greetings, Lady Aphrodite!]], "Cherub", 0)
         while messageOpen() do yield() end
         heroTalk(AphroditePlayer, "Aphrodite", 0, [[Well met, agent of Eros. When we're done here, send my son my regards.]])
         if PoseidonAI.valid and PoseidonAI.isPlayer() then
@@ -86,4 +81,10 @@ My apologies for my rudeness, my niece. Let us proceed to Olympus!]])
     end
 end
 function onTurnStart()
+    if not AphroditePlayer.valid then
+        showMessage([[Aphrodite has been defeated. You lost.]], "", 0)
+        while messageOpen() do yield() end
+        defeat()
+        return
+    end
 end

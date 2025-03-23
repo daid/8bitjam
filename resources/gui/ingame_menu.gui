@@ -1,35 +1,30 @@
 [INGAME_MENU] {
-    stretch: true
-    type: panel
-    style: overlay
-    
-    {
-        type: panel
-        layout: vertical
-        alignment: center
+    layout: vertical
+    alignment: right
 
-        [EXIT] {
-            @ref: BUTTON
-            caption: Exit
-
-            {
-                type: keynavigator
-                select: A
-                position: -8, 0
-                size: 16, 16
-                visible: true
-            }
+    [END_TURN] {
+        @ref: BUTTON
+        caption: End turn
+        {
+            type: keynavigator
+            select: A
+            position: -8, 0
+            size: 16, 16
+            visible: true
         }
-
-        [BACK] {
-            @ref: BUTTON
-            caption: Return
-        }
+    }
+    [BACK] {
+        @ref: BUTTON
+        caption: Back____
+        keybinding: B
+    }
+    [EXIT] {
+        @ref: BUTTON
+        caption: Quit____
     }
 }
 
 [@BUTTON] {
     type: button
-    size: 64, 16
-    margin: 4
+    size: 80, 16
 }

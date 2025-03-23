@@ -31,12 +31,6 @@ The turn ends once you have activated all of your units.]], "", 0)
 while messageOpen() do yield() end
 
 function onTurnEnd()
-    print("Turn end", #allUnits(0), #allUnits(1))
-    if not AphroditePlayer.valid then
-        showMessage([[You lost...]], "", 0)
-        while messageOpen() do yield() end
-        defeat()
-    end
     if #allUnits(1) == 0 then
         showMessage([[Aphrodite:
 That's the last of them.]], "Aphrodite", 0)
@@ -59,6 +53,13 @@ end
 
 turn_number = 0
 function onTurnStart()
+    if not AphroditePlayer.valid then
+        showMessage([[Aphrodite has been defeated. You lost.]], "", 0)
+        while messageOpen() do yield() end
+        defeat()
+        return
+    end
+
     turn_number = turn_number + 1
     if turn_number == 1 then
         showMessage([[Hoplite (Scout):

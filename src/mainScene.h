@@ -27,6 +27,8 @@ public:
     void buildMoveOverlay();
     void buildTargetOverlay();
     void moveCursorToFirstTarget();
+    void endPlayerTurn();
+    void openIngameMenu();
 
     sp::P<Unit> getUnitAt(sp::Vector2i);
     int moveCost(sp::Vector2i pos, sp::P<Unit> for_unit);
@@ -50,6 +52,8 @@ public:
     sp::P<sp::gui::Widget> action_gui;
     sp::P<sp::gui::Widget> hud;
     sp::P<sp::gui::Widget> unitinfo_gui;
+    sp::P<sp::gui::Widget> ingame_menu;
+    bool exit_level = false;
     sp::Timer combat_log_timer;
 
     sp::P<Unit> selected_unit;

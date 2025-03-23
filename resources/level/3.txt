@@ -211,57 +211,47 @@
 [UNITS] {
     [Aphrodite] {
         team: 0
+        x: -1
+        y: -6
+    }
+    [Apollo] {
+        team: 0
+        x: -1
+        y: -5
+    }
+    [Artemis] {
+        team: 0
+        x: -2
+        y: -6
+    }
+    [Heracles] {
+        team: 0
         x: 0
-        y: 0
+        y: -6
     }
-    [Pirate] {
-        team: 1
-        x: 5
-        y: 0
+    [Poseidon] {
+        team: 0
+        x: 0
+        y: -5
     }
-    [Pirate] {
-        team: 1
-        x: 3
+    [Hero] {
+        team: 0
+        x: -1
         y: -4
     }
     [Hoplite] {
-        team: 1
-        x: -5
-        y: 1
-    }
-    [Hoplite] {
-        team: 1
-        x: -6
-        y: 0
-    }
-    [Harpy] {
-        team: 1
-        x: 6
+        team: 0
+        x: -2
         y: -5
     }
-    [Harpy] {
-        team: 1
-        x: 6
-        y: 5
-    }
-    [Hero] {
-        team: 1
+    [Cherub] {
+        team: 0
         x: -3
-        y: 6
+        y: -6
     }
-    [Cherub] {
-        team: 1
-        x: -6
-        y: 6
-    }
-    [Cherub] {
-        team: 1
-        x: -8
-        y: 6
-    }
-    [Aphrodite] {
-        team: 1
-        x: -7
-        y: 5
+    [Pirate] {
+        team: 0
+        x: 1
+        y: -6
     }
 }

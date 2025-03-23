@@ -81,8 +81,8 @@
         heart: 7
         sprite.red: sprites/HeraclesRed.txt
         sprite.blue: sprites/HeraclesBlue.txt
-        action.0: label=Punch type=attack range=1 damage=5 class=punch
-        action.0: type=charm range=1 damage=1
+        action.0: label=Punch type=attack range=1 damage=4 class=punch
+        action.1: type=charm range=1 damage=1
         description: None other can match blows with the great Heracles! One punch is enough to leave most foes reeling, so try not to be in his range lest you find yourself taking an express trip with the ferryman.
         charmline.0: My fists are mighty, but my heart is my strongest muscle.
     }

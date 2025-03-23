@@ -10,6 +10,7 @@
 #include <sp2/graphics/gui/loader.h>
 #include <sp2/graphics/spriteAnimation.h>
 #include <sp2/random.h>
+#include <sp2/audio/sound.h>
 #include <sp2/engine.h>
 #include <sp2/scene/camera.h>
 #include <sp2/scene/tilemap.h>
@@ -49,7 +50,6 @@ Scene::Scene(sp::string start_level)
 : sp::Scene("MAIN")
 {
     scene_instance = this;
-    sp::Scene::get("INGAME_MENU")->enable();
 
     hud = sp::gui::Loader::load("gui/hud.gui", "HUD");
 
@@ -62,7 +62,7 @@ Scene::~Scene()
     hud.destroy();
     action_gui.destroy();
     unitinfo_gui.destroy();
-    sp::Scene::get("INGAME_MENU")->disable();
+    ingame_menu.destroy();
 }
 
 void Scene::onUpdate(float delta)
@@ -72,7 +72,10 @@ void Scene::onUpdate(float delta)
     if (hud->getWidgetWithID("MESSAGE_WINDOW")->isVisible()) {
         if (controller.a.getDown()) hud->getWidgetWithID("MESSAGE_WINDOW")->hide();
     }
-    if (unitinfo_gui) {
+    if (ingame_menu) {
+        if (escape_key.getDown())
+            ingame_menu.destroy();
+    } else if (unitinfo_gui) {
         if (controller.a.getDown()) unitinfo_gui.destroy();
         if (controller.b.getDown()) unitinfo_gui.destroy();
     } else if (!script_coroutine && !hud->getWidgetWithID("MESSAGE_WINDOW")->isVisible()) {
@@ -102,6 +105,11 @@ void Scene::onUpdate(float delta)
 
         if (controller.a.getDown()) activateCursor();
         if (controller.b.getDown()) deactivateCursor();
+        if (controller.start.getDown() || escape_key.getDown()) {
+            if (player_action_state == PlayerActionState::SelectAction)
+                deactivateCursor();
+            openIngameMenu();
+        }
     }
 
     switch(player_action_state)
@@ -116,6 +124,12 @@ void Scene::onUpdate(float delta)
             } else {
                 cursor->animationPlay("Error");
             }
+            auto tt = getTileType(ground_tilemap->getTileIndex(cursor_pos));
+            auto tc = selected_unit->unit_info->terrain_class;
+            if (tc->move_cost[int(tt)] < 1000)
+                hud->getWidgetWithID("COMBAT_LOG")->setAttribute("caption", getTileTypeName(tt).capitalize() + " Move: " + sp::string(tc->move_cost[int(tt)]) + " Def: " + sp::string(tc->defense[int(tt)]));
+            else
+                hud->getWidgetWithID("COMBAT_LOG")->setAttribute("caption", getTileTypeName(tt).capitalize());
         }
         break;
     case PlayerActionState::WaitMoveDone:
@@ -183,26 +197,12 @@ void Scene::onUpdate(float delta)
                     player_ready = true;
             }
             if (!player_ready) {
-                // Next turn
-                for(sp::P<Unit> unit : getRoot()->getChildren()) {
-                    if (unit && unit->team == Team::Player)
-                        unit->setReady(true);
-                }
-                player_action_state = PlayerActionState::ExecuteAITurn;
-                ai_timer.start(1.0);
-
-                auto res = script_env->callCoroutine("onTurnEnd");
-                if (res.isErr()) {
-                    LOG(Debug, "Lua error:", res.error());
-                    hud->getWidgetWithID("LUA_ERROR")->setAttribute("caption", res.error());
-                } else {
-                    script_coroutine = res.value();
-                }
+                endPlayerTurn();
             }
         }
         break;
     case PlayerActionState::ExecuteAITurn:
-        if (ai_timer.isExpired() && !script_coroutine) {
+        if ((ai_timer.isExpired() || !ai_timer.isRunning()) && !script_coroutine && !combat_log_timer.isRunning()) {
             checkDeadUnits();
 
             sp::P<Unit> ai_unit;
@@ -261,7 +261,7 @@ void Scene::onUpdate(float delta)
 
     auto unit = getUnitAt(cursor_pos);
     if (unit) {
-        hud->getWidgetWithID("HP")->setAttribute("caption", sp::string(unit->hp) + "/" + sp::string(unit->unit_info->max_hp));
+        hud->getWidgetWithID("HP")->setAttribute("caption", sp::string(unit->hp) + "/" + sp::string(unit->unit_info->max_hp) + " " + unit->getCharmInfo());
         hud->getWidgetWithID("NAME")->setAttribute("caption", unit->unit_info->name);
     } else {
         hud->getWidgetWithID("HP")->setAttribute("caption", "-");
@@ -273,7 +273,7 @@ void Scene::onUpdate(float delta)
         if (log_entry != "") {
             hud->getWidgetWithID("COMBAT_LOG")->setAttribute("caption", log_entry);
             hud->getWidgetWithID("STATUS_LINE")->hide();
-            combat_log_timer.start(3.5);
+            combat_log_timer.start(1.5);
         } else {
             hud->getWidgetWithID("STATUS_LINE")->show();
         }
@@ -298,6 +298,10 @@ void Scene::onUpdate(float delta)
         hud->getWidgetWithID("MESSAGE_WINDOW")->setAttribute("position", "0, 160");
     else
         hud->getWidgetWithID("MESSAGE_WINDOW")->setAttribute("position", "0, 0");
+    if (exit_level) {
+        delete this;
+        openMainMenu();
+    }
 }
 
 void Scene::onFixedUpdate()
@@ -455,13 +459,17 @@ void Scene::loadLevel(const sp::string& name)
         if (unit && unit->team == Team::Player) script_env->setGlobal(unit->unit_info->key + "Player", unit);
         if (unit && unit->team == Team::AI) script_env->setGlobal(unit->unit_info->key + "AI", unit);
     }
-    auto res = script_env->loadCoroutine("level/" + name + ".lua");
+    sp::string script_name = "level/" + name + ".lua";
+    if (sp::io::ResourceProvider::get(script_name) == nullptr)
+        script_name = "level/default.lua";
+    auto res = script_env->loadCoroutine(script_name);
     if (res.isErr()) {
         LOG(Debug, "Lua error:", res.error());
         hud->getWidgetWithID("LUA_ERROR")->setAttribute("caption", res.error());
     } else {
         script_coroutine = res.value();
     }
+    hud->getWidgetWithID("COMBAT_LOG")->setAttribute("caption", "");
 }
 
 void Scene::moveCursor(sp::Vector2i offset)
@@ -469,6 +477,7 @@ void Scene::moveCursor(sp::Vector2i offset)
     if (player_action_state == PlayerActionState::SelectUnit || player_action_state == PlayerActionState::SelectMoveTarget || player_action_state == PlayerActionState::SelectTarget) {
         auto p = cursor_pos + offset;
         if (level_size.contains(p)) {
+            //sp::audio::Sound::play("sfx/cursor-move.wav");
             cursor_pos = p;
             cursor->setPosition(sp::Vector2d(cursor_pos) + sp::Vector2d(0.5, 0.5));
         }
@@ -491,6 +500,7 @@ void Scene::activateCursor()
             buildMoveOverlay();
         } else {
             selected_unit = nullptr;
+            openIngameMenu();
         }
         break;
     case PlayerActionState::SelectMoveTarget:
@@ -539,16 +549,7 @@ void Scene::deactivateCursor()
             unitinfo_gui = sp::gui::Loader::load("gui/unitinfo.gui", "UNITINFO");
             unitinfo_gui->getWidgetWithID("NAME")->setAttribute("caption", unit->unit_info->name);
             sp::string hp_info = "[HEART]:" + sp::string(unit->hp) + "/" + sp::string(unit->unit_info->max_hp) + " ";
-            hp_info += "[CHARM]:";
-            sp::string hp0 = "[HP0]";
-            sp::string hp1 = "[HP1]";
-            if (unit->team == Team::AI) std::swap(hp0, hp1);
-            for(int n=0; n<unit->unit_info->max_heart; n++) {
-                if (n < unit->heart)
-                    hp_info += hp0;
-                else
-                    hp_info += hp1;
-            }
+            hp_info += unit->getCharmInfo();
             unitinfo_gui->getWidgetWithID("HP")->setAttribute("caption", hp_info);
             unitinfo_gui->getWidgetWithID("DESCRIPTION")->setAttribute("caption", unit->unit_info->description);
             sp::string action_info;
@@ -581,6 +582,7 @@ void Scene::deactivateCursor()
         selection_cursor.destroy();
         move_overlay.destroy();
         selected_unit = nullptr;
+        hud->getWidgetWithID("COMBAT_LOG")->setAttribute("caption", "");
         break;
     case PlayerActionState::WaitMoveDone: break;
     case PlayerActionState::SelectAction:
@@ -683,6 +685,40 @@ void Scene::moveCursorToFirstTarget()
     }
 }
 
+void Scene::openIngameMenu()
+{
+    ingame_menu = sp::gui::Loader::load("gui/ingame_menu.gui", "INGAME_MENU");
+    ingame_menu->getWidgetWithID("END_TURN")->setEventCallback([this](sp::Variant) {
+        ingame_menu.destroy();
+        endPlayerTurn();
+    });
+    ingame_menu->getWidgetWithID("BACK")->setEventCallback([this](sp::Variant) {
+        ingame_menu.destroy();
+    });
+    ingame_menu->getWidgetWithID("EXIT")->setEventCallback([this](sp::Variant) {
+        exit_level = true;
+    });
+}
+
+void Scene::endPlayerTurn()
+{
+    // Next turn
+    for(sp::P<Unit> unit : getRoot()->getChildren()) {
+        if (unit && unit->team == Team::Player)
+            unit->setReady(true);
+    }
+    player_action_state = PlayerActionState::ExecuteAITurn;
+    ai_timer.start(1.0);
+
+    auto res = script_env->callCoroutine("onTurnEnd");
+    if (res.isErr()) {
+        LOG(Debug, "Lua error:", res.error());
+        hud->getWidgetWithID("LUA_ERROR")->setAttribute("caption", res.error());
+    } else {
+        script_coroutine = res.value();
+    }
+}
+
 void Scene::checkDeadUnits()
 {
     for(sp::P<Unit> unit : getRoot()->getChildren()) {
@@ -706,6 +742,7 @@ void Scene::executeAITurnFor(sp::P<Unit> unit)
         float score;
     };
     std::vector<Move> possible_attack_moves;
+    std::vector<Move> possible_charm_moves;
     std::vector<Move> possible_normal_moves;
 
     astar_source = unit;
@@ -715,12 +752,15 @@ void Scene::executeAITurnFor(sp::P<Unit> unit)
                 possible_normal_moves.push_back({p, nullptr, nullptr, scorePosition(p, unit->team)});
             }
             for(const auto& action : selected_unit->unit_info->actions) {
-                if (action.type != Action::Type::Attack) continue;
+                if (action.type == Action::Type::Wait) continue;
                 for(auto offset : action.targetOffsets()) {
                     auto ap = p + offset;
                     auto target = getUnitAt(ap);
                     if (target && target->team == Team::Player) {
-                        possible_attack_moves.push_back({p, &action, target, 0});
+                        if (action.type == Action::Type::Attack)
+                            possible_attack_moves.push_back({p, &action, target, 0.0f});
+                        if (action.type == Action::Type::Charm)
+                            possible_charm_moves.push_back({p, &action, target, -float(target->heart) + sp::random(0.0f, 0.8f)});
                     }
                 }
             }
@@ -728,6 +768,18 @@ void Scene::executeAITurnFor(sp::P<Unit> unit)
     }
     if (!possible_attack_moves.empty()) {
         auto move = possible_attack_moves[sp::irandom(0, possible_attack_moves.size()-1)];
+        if (move.position != unit->pos) {
+            auto path = AStar<sp::Vector2i>(unit->pos, move.position, getAStarNeighbors, getAStarDistance);
+            if (path.empty()) return;
+            unit->animateMovement(path);
+            unit->pos = move.position;
+        }
+        selected_action = move.action;
+        target_unit = move.target;
+    }
+    else if (!possible_charm_moves.empty()) {
+        std::sort(possible_charm_moves.begin(), possible_charm_moves.end(), [](const auto& a, const auto& b) { return a.score > b.score; });
+        auto move = possible_charm_moves[0];
         if (move.position != unit->pos) {
             auto path = AStar<sp::Vector2i>(unit->pos, move.position, getAStarNeighbors, getAStarDistance);
             if (path.empty()) return;
