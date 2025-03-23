@@ -2,6 +2,7 @@
 #include "unit.h"
 #include "healthbareffect.h"
 #include "combatlog.h"
+#include <sp2/audio/sound.h>
 
 //AAAAAAAAAAAAAAAAHHHHHHHHHHHHH
 void luaShowMessage(sp::string message, sp::string unit, int team);
@@ -44,6 +45,7 @@ void Action::execute(sp::P<Unit> source, sp::P<Unit> target, TileType tt) const
     int actual_damage = damage;
     switch(type) {
     case Type::Attack:
+        sp::audio::Sound::play("sfx/attack.wav");
         actual_damage = std::max(0, actual_damage - target->unit_info->terrain_class->defense[int(tt)]);
         target->hp -= actual_damage;
         if (actual_damage == 0)
@@ -54,6 +56,7 @@ void Action::execute(sp::P<Unit> source, sp::P<Unit> target, TileType tt) const
             addCombatLog(target->unit_info->name + " died");
         break;
     case Type::Charm:
+        sp::audio::Sound::play("sfx/unit-move.wav");
         if (source->team == target->team) {
             target->hp = std::min(target->hp + damage * 2, target->unit_info->max_hp);
             target->heart = std::min(target->heart + damage, target->unit_info->max_heart);
@@ -65,6 +68,7 @@ void Action::execute(sp::P<Unit> source, sp::P<Unit> target, TileType tt) const
                 target->setReady(false);
                 target->heart = target->unit_info->max_heart;
                 luaShowMessage(target->unit_info->name + ":\n" + target->unit_info->getCharmLine(), target->unit_info->key, int(target->team));
+                sp::audio::Sound::play("sfx/heart-charm.wav");
             } else {
                 addCombatLog(target->unit_info->name + " remains fighting");
             }

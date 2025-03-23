@@ -68,6 +68,7 @@
     [Aphrodite] {
         name: Aphrodite
         hp: 15
+        heart: 5
         sprite.red: sprites/AphroditeRed.txt
         sprite.blue: sprites/AphroditeBlue.txt
         action.0: type=charm range=1 damage=2
@@ -129,6 +130,8 @@
         heart: 12
         sprite.red: sprites/ZeusRed.txt
         sprite.blue: sprites/ZeusBlue.txt
+        action.0: label=Bolt type=attack range=2 damage=3 class=bolt
+        action.1: type=charm range=1 damage=1
         description: The all father Zeus, strongest of the Gods of Olympus with the fury of the very skies at his fingertips. Those that do not fall to his bolts are known to fall for his Charm. The ultimate challenge to take your seat among the heavens.
         charmline.0: You're right. Why are we bothering ourselves with conflict when we could be forging a stronger bond?
     }

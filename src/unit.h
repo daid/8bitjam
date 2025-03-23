@@ -33,6 +33,7 @@ public:
     int hp = 5;
     int heart = 3;
     Team team = Team::Player;
+    bool allow_carry_over = true;
     bool destroy_me = false;
 
     std::vector<sp::Vector2i> move_path;
@@ -47,6 +48,7 @@ public:
     void luaSetY(int y);
     void luaDestroy();
     bool luaIsPlayer();
+    void luaSetGhost();
 protected:
     void onRegisterScriptBindings(sp::script::BindingClass& script_binding_class) override;
 };

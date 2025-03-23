@@ -150,6 +150,11 @@ bool Unit::luaIsPlayer()
     return team == Team::Player;
 }
 
+void Unit::luaSetGhost()
+{
+    allow_carry_over = false;
+}
+
 void Unit::onRegisterScriptBindings(sp::script::BindingClass& script_binding_class)
 {
     script_binding_class.bind("teleport", &Unit::luaTeleport);
@@ -157,6 +162,7 @@ void Unit::onRegisterScriptBindings(sp::script::BindingClass& script_binding_cla
     script_binding_class.bind("isMoving", &Unit::luaIsMoving);
     script_binding_class.bind("isPlayer", &Unit::luaIsPlayer);
     script_binding_class.bind("destroy", &Unit::luaDestroy);
+    script_binding_class.bind("setGhost", &Unit::luaSetGhost);
 
     script_binding_class.bindProperty("x", &Unit::luaGetX, &Unit::luaSetX);
     script_binding_class.bindProperty("y", &Unit::luaGetY, &Unit::luaSetY);

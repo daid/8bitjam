@@ -251,7 +251,7 @@ void Scene::onUpdate(float delta)
         if (!script_coroutine) {
             has_heroes.clear();
             for(sp::P<Unit> unit : getRoot()->getChildren()) {
-                if (unit && unit->team == Team::Player)
+                if (unit && unit->team == Team::Player && unit->allow_carry_over)
                     has_heroes.insert(unit->unit_info->key);
             }
             loadLevel(sp::string(sp::stringutil::convert::toInt(current_level) + 1));

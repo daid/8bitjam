@@ -127,12 +127,12 @@
             caption: Art and Assets
         }
         {
-            @ref: CREDITS_TITLE
-            caption: Fonts:
+            @ref: CREDITS_LINE
+            caption: Materia Steele
         }
         {
             @ref: CREDITS_LINE
-            caption: https://fonts.google.com/specimen/Roboto
+            caption: PsychicVampire5050
         }
 
         {
@@ -140,88 +140,26 @@
             caption: Code
         }
         {
-            @ref: CREDITS_TITLE
-            caption: SeriousProton2 Engine
+            @ref: CREDITS_LINE
+            caption: Daid
+        }
+
+        {
+            @ref: CREDITS_SECTION
+            caption: Story
         }
         {
             @ref: CREDITS_LINE
-            caption: https://github.com/daid/SeriousProton2
+            caption: Materia Steele
         }
+
         {
-            @ref: CREDITS_TITLE
-            caption: miniz library: MIT License
-        }
-        {
-            @ref: CREDITS_LINE
-            caption: Copyright 2013-2014 RAD Game Tools and Valve Software\
-                Copyright 2010-2014 Rich Geldreich and Tenacious Software LLC
-        }
-        {
-            @ref: CREDITS_TITLE
-            caption: lua library: MIT License
+            @ref: CREDITS_SECTION
+            caption: Audio
         }
         {
             @ref: CREDITS_LINE
-            caption: Copyright (C) 1994-2015 Lua.org, PUC-Rio
-        }
-        {
-            @ref: CREDITS_TITLE
-            caption: json11 library: MIT License
-        }
-        {
-            @ref: CREDITS_LINE
-            caption: Copyright (C) 2013 Dropbox, Inc.
-        }
-        {
-            @ref: CREDITS_TITLE
-            caption: freetype2 library: BSD License
-        }
-        {
-            @ref: CREDITS_LINE
-            caption: Portions of this software are copyright ©\
-                2006 The FreeType Project (www.freetype.org).\
-                All rights reserved.
-        }
-        {
-            @ref: CREDITS_TITLE
-            caption: bullet3d library: zlib License
-        }
-        {
-            @ref: CREDITS_LINE
-            caption: Bullet Continuous Collision Detection and Physics Library\
-                http://bulletphysics.org
-        }
-        {
-            @ref: CREDITS_TITLE
-            caption: box2d library: zlib License
-        }
-        {
-            @ref: CREDITS_LINE
-            caption: Copyright (c) 2006-2013 Erin Catto http://www.gphysics.com
-        }
-        {
-            @ref: CREDITS_TITLE
-            caption: SDL2 library: zlib License
-        }
-        {
-            @ref: CREDITS_LINE
-            caption: Copyright (C) 1997-2019 Sam Lantinga slouken@libsdl.org
-        }
-        {
-            @ref: CREDITS_TITLE
-            caption: gif.h: Public domain
-        }
-        {
-            @ref: CREDITS_LINE
-            caption: Charlie Tangora
-        }
-        {
-            @ref: CREDITS_TITLE
-            caption: stb_image, stb_image_write, stb_vorbis: Public domain
-        }
-        {
-            @ref: CREDITS_LINE
-            caption: http://github.com/nothings
+            caption: Barber
         }
     }
     
@@ -299,7 +237,8 @@
 }
 [@CREDITS_SECTION] {
     type: label
-    scale_to_text: true
+    size: 16, 16
+    margin: 0, 0, 16, 0
     text.size: 8
     alignment: center
 }

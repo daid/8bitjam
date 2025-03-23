@@ -54,6 +54,7 @@ void openMainMenu()
         menu.destroy();
         openEditor();
     });
+    menu->getWidgetWithID("EDITOR")->hide();
     menu->getWidgetWithID("OPTIONS")->setEventCallback([=](sp::Variant v) mutable {
         menu.destroy();
         openOptionsMenu();
@@ -268,7 +269,7 @@ int main(int argc, char** argv)
     sp::P<sp::Engine> engine = new sp::Engine();
     SP_REGISTER_WIDGET("BorderPanel", BorderPanel);
     sp::audio::Sound::setVolume(50);
-    sp::audio::Music::setVolume(50);
+    sp::audio::Music::setVolume(30);
 #ifdef DEBUG
     sp::audio::Music::setVolume(0);
 #endif
@@ -283,7 +284,7 @@ int main(int argc, char** argv)
     window = new sp::Window(256.0f/224.0f);
     window->setClearColor({0, 0, 0});
 #if !defined(DEBUG) && !defined(EMSCRIPTEN)
-    window->setFullScreen(true);
+    //window->setFullScreen(true);
 #endif
 
     sp::gui::Theme::loadTheme("default", "gui/theme/basic.theme.txt");

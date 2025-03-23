@@ -387,4 +387,69 @@
         x: 0
         y: 7
     }
+    [Poseidon] {
+        team: 0
+        x: -3
+        y: -4
+    }
+    [Hero] {
+        team: 0
+        x: -3
+        y: -5
+    }
+    [Pirate] {
+        team: 0
+        x: -4
+        y: -5
+    }
+    [Hoplite] {
+        team: 0
+        x: -5
+        y: -3
+    }
+    [Hoplite] {
+        team: 0
+        x: -7
+        y: -3
+    }
+    [Heracles] {
+        team: 0
+        x: -5
+        y: -4
+    }
+    [Harpy] {
+        team: 0
+        x: -7
+        y: -5
+    }
+    [Harpy] {
+        team: 0
+        x: -5
+        y: -5
+    }
+    [Cherub] {
+        team: 0
+        x: -6
+        y: -5
+    }
+    [Artemis] {
+        team: 0
+        x: -7
+        y: -4
+    }
+    [Apollo] {
+        team: 0
+        x: -6
+        y: -4
+    }
+    [Pirate] {
+        team: 0
+        x: -4
+        y: -6
+    }
+    [Cherub] {
+        team: 0
+        x: -8
+        y: -5
+    }
 }

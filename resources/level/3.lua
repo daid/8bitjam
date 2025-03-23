@@ -46,6 +46,7 @@ while AphroditePlayer.isMoving() do yield() end
 AphroditePlayer.move(0, 0)
 while AphroditePlayer.isMoving() do yield() end
 AphroditeAI = createUnit(0, -1, "Aphrodite", 1)
+AphroditeAI.setGhost()
 heroTalk(AphroditePlayer, "Aphrodite", 0, [[Aphrodite:
 What sorcery is this!?]])
 heroTalk(AphroditeAI, "Aphrodite", 1, [[Aphrodite?:
@@ -91,6 +92,7 @@ function onTurnStart()
     turn_nr = turn_nr + 1
     if turn_nr == 3 then
         ArtemisAI = createUnit(-7, -4, "Artemis", 1)
+        ArtemisAI.setGhost()
         createUnit(-8, -4, "Pirate", 1)
         createUnit(-7, -5, "Pirate", 1)
         heroTalk(ArtemisAI, "Artemis", 1, [[Artemis?:
@@ -100,7 +102,9 @@ Great, now there's more of them.]])
     end
     if turn_nr == 5 then
         ApolloAI = createUnit(-7, 5, "Apollo", 1)
+        ApolloAI.setGhost()
         HeraclesAI = createUnit(-8, 6, "Heracles", 1)
+        HeraclesAI.setGhost()
         createUnit(-8, 5, "Hero", 1)
         createUnit(-7, 6, "Hero", 1)
         createUnit(-3, 6, "Hoplite", 1)
@@ -116,6 +120,7 @@ One who has not completed the twelve labours has no right to call themself stron
     end
     if turn_nr == 7 then
         PoseidonAI = createUnit(6, -2, "Poseidon", 1)
+        PoseidonAI.setGhost()
         createUnit(6, 5, "Harpy", 1)
         createUnit(5, 0, "Pirate", 1)
         createUnit(3,-4, "Pirate", 1)
@@ -141,6 +146,7 @@ Hold strong! We will weather this storm together!]])
                 AphroditeAI = createUnit(x, y, "Aphrodite", 1)
             end
             AphroditeAI.teleport(-7, 5)
+            AphroditeAI.setGhost()
             heroTalk(AphroditeAI, "Aphrodite", 1, [[Aphrodite?:
 Hehehe... Will you survive the full might of the Evil Eye!?]])
             createUnit(-8, 6, "Cherub", 1)
